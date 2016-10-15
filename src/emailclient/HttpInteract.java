@@ -2,7 +2,11 @@ package emailclient;
 
 /**
  * ***********************************
- * Filename: HttpInteract.java Names: Student-IDs: Date:
+ * Filename: 
+ * HttpInteract.java 
+ * Names: 
+ * Student-IDs: 
+ * Date:
  * ***********************************
  */
 import java.net.*;
@@ -43,6 +47,7 @@ public class HttpInteract {
          * server closes connection after one response. 
          */
         requestMessage = "GET " + path + " HTTP/1.1" + CRLF + "Host: " + host + CRLF + CRLF;
+        return;
     }
 
     /* Send Http request, parse response and return requested object 
@@ -55,7 +60,7 @@ public class HttpInteract {
         char[] buf = new char[BUF_SIZE];
 
         /* Maximum size of object is 100kB, which should be enough for most objects. 
-		 * Change constant if you need more. */
+         * Change constant if you need more. */
         char[] body = new char[MAX_OBJECT_SIZE];
 
         String statusLine = "";	// status line
@@ -89,8 +94,8 @@ public class HttpInteract {
         System.out.println("Status Line:\n" + statusLine + CRLF);
 
         /* Extract status code from status line. If status code is not 200,
-		 * close connection and return an error message. 
-		 * Do NOT throw an exception */
+	 * close connection and return an error message. 
+	 * Do NOT throw an exception */
         String[] temp = statusLine.split(" ");
         if ((status = Integer.parseInt(temp[1])) != 200) {
             return ("Error: a failure happend when accruing the file");
@@ -131,7 +136,7 @@ public class HttpInteract {
         int bytesRead = 0;
         int remainBytes = bodyLength;
         if (bodyLength == -1) {
-            return ("No body length info fonded");
+            return ("No body length info found");
         }
         while (bytesRead < Math.min(bodyLength, MAX_OBJECT_SIZE)) {
             try {
