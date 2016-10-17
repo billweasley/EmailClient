@@ -6,6 +6,9 @@
 package emailclient;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,8 +19,13 @@ public class DefaltLocalSender {
     private String prefix = System.getProperty("user.name");
     private String hostName;
 
-    public DefaltLocalSender(InetAddress ia) {
-        this.hostName = ia.getHostName();
+    public DefaltLocalSender() {
+
+        try {
+            this.hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override

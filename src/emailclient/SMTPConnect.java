@@ -75,7 +75,7 @@ public class SMTPConnect {
         cammand = "DATA" + CRLF;
         sendCommand(cammand, 354);
         cammand = mailmessage.getHeaders() + CRLF + mailmessage.getBody() + CRLF + "." + CRLF;
-        toServer.writeBytes(cammand);
+        sendCommand(cammand, 250);
 
     }
 
@@ -98,6 +98,7 @@ public class SMTPConnect {
         toServer.writeBytes(command);
         /* Write command to server and read reply from server. */
         String msg = fromServer.readLine();
+        System.out.println(msg);
         /* Check that the server's reply code is the same as the parameter
 	   rc. If not, throw an IOException. */
         if (!msg.startsWith(String.valueOf(rc))) {

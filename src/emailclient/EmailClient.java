@@ -2,7 +2,9 @@ package emailclient;
 
 /**
  * ***********************************
- * Filename: EmailClient.java Date: **********************************
+ * Filename: EmailClient.java 
+ * Date: 
+ * ***********************************
  */
 import java.io.*;
 import java.net.*;
@@ -18,11 +20,11 @@ public class EmailClient extends Frame {
     private Label serverLabel = new Label("Local mailserver:");
     private TextField serverField = new TextField("mail.csc.liv.ac.uk", 40);
     private Label fromLabel = new Label("From:");
-    private TextField fromField = new TextField("", 40);
+    private TextField fromField = new TextField("csstudy@liverpool.ac.uk", 40);
     private Label toLabel = new Label("To:");
-    private TextField toField = new TextField("", 40);
+    private TextField toField = new TextField("sghwan26@student.liverpool.ac.uk;haoxuan.wang26@student.xjtlu.edu.cn", 40);
     private Label ccLabel = new Label("Cc:");
-    private TextField ccField = new TextField("", 40);
+    private TextField ccField = new TextField("billweasley20092@hotmail.com", 40);
     private Label subjectLabel = new Label("Subject:");
     private TextField subjectField = new TextField("", 40);
     private Label messageLabel = new Label("Message:");
@@ -94,6 +96,7 @@ public class EmailClient extends Frame {
     }
 
     static public void main(String argv[]) {
+        System.out.println(new DefaltLocalSender());
         new EmailClient();
     }
 
@@ -192,6 +195,7 @@ public class EmailClient extends Frame {
             System.out.println("Clearing fields");
             fromField.setText("");
             toField.setText("");
+            ccField.setText("");
             subjectField.setText("");
             messageText.setText("");
         }

@@ -73,8 +73,18 @@ public class EmailMessage {
         Ccs = CcList.split(";");
 
         Headers = "From: " + Sender + CRLF;
-        Headers += "To: " + RecipientList + CRLF;
-        Headers += "Cc: " + CcList + CRLF;
+        Headers += "To: ";
+        for (String rec : Recipients) {
+            Headers += (rec + ",");
+        }
+        Headers += CRLF;
+
+        Headers += "Cc: ";
+        for (String rec : Ccs) {
+            Headers += (rec + ",");
+        }
+        Headers += CRLF;
+
         Headers += "Subject: " + subject.trim() + CRLF;
 
         /*
@@ -154,8 +164,19 @@ public class EmailMessage {
         String res;
 
         res = "Sender: " + Sender + '\n';
-        res += "Recipients: " + RecipientList + '\n';
-        res += "CC: " + CcList + '\n';
+        
+        res += "To: ";
+        for (String rec : Recipients) {
+            res += (rec + ",");
+        }
+        res += '\n';
+
+        res += "Cc: ";
+        for (String rec : Ccs) {
+            res += (rec + ",");
+        }
+        res += '\n';
+        
         res += "MX-host: " + DestHost + ", address: " + DestAddr + '\n';
         res += "Message:" + '\n';
         res += Headers + CRLF;
