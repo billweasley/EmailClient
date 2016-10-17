@@ -2,11 +2,7 @@ package emailclient;
 
 /**
  * ***********************************
- * Filename: 
- * SMTPConnect.java 
- * Names: 
- * Student-IDs: 
- * Date:
+ * Filename: SMTPConnect.java Names: Student-IDs: Date:
  * ***********************************
  */
 import java.net.*;
@@ -68,8 +64,14 @@ public class SMTPConnect {
 	   exception thrown from sendCommand(). */
         cammand = "MAIL FROM: <" + mailmessage.getSender() + ">" + CRLF;
         sendCommand(cammand, 250);
-        cammand = "RCPT TO: <" + mailmessage.getRecipient() + ">" + CRLF;
-        sendCommand(cammand, 250);
+        for (String recipent : mailmessage.getRecipients()) {
+            cammand = "RCPT TO: <" + recipent + ">" + CRLF;
+            sendCommand(cammand, 250);
+        }
+        for (String recipent : mailmessage.getCcs()) {
+            cammand = "RCPT TO: <" + recipent + ">" + CRLF;
+            sendCommand(cammand, 250);
+        }
         cammand = "DATA" + CRLF;
         sendCommand(cammand, 354);
         cammand = mailmessage.getHeaders() + CRLF + mailmessage.getBody() + CRLF + "." + CRLF;
@@ -82,7 +84,7 @@ public class SMTPConnect {
     public void close() {
         isConnected = false;
         try {
-            sendCommand("QUIT" + CRLF, 250);  //?221
+            sendCommand("QUIT" + CRLF, 221);  //?221
             connection.close();
         } catch (IOException e) {
             System.out.println("Unable to close connection: " + e);

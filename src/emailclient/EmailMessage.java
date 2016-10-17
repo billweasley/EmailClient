@@ -1,10 +1,9 @@
 package emailclient;
+
 /**
  * ***********************************
- * Filename:  EmailMessage.java
- ************************************
+ * Filename: EmailMessage.java ***********************************
  */
-
 import java.util.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -15,7 +14,11 @@ public class EmailMessage {
     /* SMTP-sender of the message (in this case, contents of From-header. */
     private String Sender;
     /* SMTP-recipient, or contents of To-header. */
-    private String Recipient;
+    private String RecipientList;
+    private String[] Recipients;
+
+    private String CcList;
+    private String[] Ccs;
 
     /* Target MX-host */
     private String DestHost;
@@ -32,8 +35,12 @@ public class EmailMessage {
         return Sender;
     }
 
-    public String getRecipient() {
-        return Recipient;
+    public String[] getRecipients() {
+        return Recipients;
+    }
+
+    public String[] getCcs() {
+        return Ccs;
     }
 
     public String getDestHost() {
@@ -52,19 +59,22 @@ public class EmailMessage {
         return Body;
     }
 
-
     /*
 	 * Create the message object by inserting the required headers from RFC 822
 	 * (From, To, Date).
      */
-    public EmailMessage(String from, String to, String subject, String text,
+    public EmailMessage(String from, String to, String cc, String subject, String text,
             String localServer) throws UnknownHostException {
         /* Remove whitespace */
         Sender = from.trim();
-        Recipient = to.trim();
+        RecipientList = to.trim();
+        Recipients = RecipientList.split(";");
+        CcList = cc.trim();
+        Ccs = CcList.split(";");
 
         Headers = "From: " + Sender + CRLF;
-        Headers += "To: " + Recipient + CRLF;
+        Headers += "To: " + RecipientList + CRLF;
+        Headers += "Cc: " + CcList + CRLF;
         Headers += "Subject: " + subject.trim() + CRLF;
 
         /*
@@ -99,34 +109,53 @@ public class EmailMessage {
 	 * sender and recipient contain only one @-sign.
      */
     public boolean isValid() {
-        int fromat = Sender.indexOf('@');
-        int toat = Recipient.indexOf('@');
-
-        if (fromat < 1 || (Sender.length() - fromat) <= 1) {
-            System.out.println("Sender address is invalid");
-            return false;
+        int fromat;
+        int toat;
+        if (!CcList.equals("")) {
+            for (String string : Ccs) {
+                toat = string.indexOf('@');
+                if (toat < 1 || (string.length() - toat) <= 1) {
+                    System.out.println(string + " Cc address is invalid");
+                    return false;
+                }
+                if (toat != string.lastIndexOf('@')) {
+                    System.out.println(string + " Cc address is invalid");
+                    return false;
+                }
+            }
         }
-        if (toat < 1 || (Recipient.length() - toat) <= 1) {
-            System.out.println("Recipient address is invalid");
+        for (String string : Recipients) {
+            toat = string.indexOf('@');
+            if (toat < 1 || (string.length() - toat) <= 1) {
+                System.out.println(string + " Recipient address is invalid");
+                return false;
+            }
+            if (toat != string.lastIndexOf('@')) {
+                System.out.println(string + " Recipient address is invalid");
+                return false;
+            }
+        }
+
+        fromat = Sender.indexOf('@');
+        if (fromat < 1 || (Sender.length() - fromat) <= 1) {
+            System.out.println(Sender + " Sender address is invalid");
             return false;
         }
         if (fromat != Sender.lastIndexOf('@')) {
-            System.out.println("Sender address is invalid");
-            return false;
-        }
-        if (toat != Recipient.lastIndexOf('@')) {
-            System.out.println("Recipient address is invalid");
+            System.out.println(Sender + " Sender address is invalid");
             return false;
         }
         return true;
     }
 
     /* For printing the message. */
+    @Override
     public String toString() {
         String res;
 
         res = "Sender: " + Sender + '\n';
-        res += "Recipient: " + Recipient + '\n';
+        res += "Recipients: " + RecipientList + '\n';
+        res += "CC: " + CcList + '\n';
         res += "MX-host: " + DestHost + ", address: " + DestAddr + '\n';
         res += "Message:" + '\n';
         res += Headers + CRLF;

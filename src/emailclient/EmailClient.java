@@ -2,8 +2,7 @@ package emailclient;
 
 /**
  * ***********************************
- * Filename: EmailClient.java Date: 
- ***********************************
+ * Filename: EmailClient.java Date: **********************************
  */
 import java.io.*;
 import java.net.*;
@@ -22,6 +21,8 @@ public class EmailClient extends Frame {
     private TextField fromField = new TextField("", 40);
     private Label toLabel = new Label("To:");
     private TextField toField = new TextField("", 40);
+    private Label ccLabel = new Label("Cc:");
+    private TextField ccField = new TextField("", 40);
     private Label subjectLabel = new Label("Subject:");
     private TextField subjectField = new TextField("", 40);
     private Label messageLabel = new Label("Message:");
@@ -42,6 +43,7 @@ public class EmailClient extends Frame {
         Panel serverPanel = new Panel(new BorderLayout());
         Panel fromPanel = new Panel(new BorderLayout());
         Panel toPanel = new Panel(new BorderLayout());
+        Panel ccPanel = new Panel(new BorderLayout());
         Panel subjectPanel = new Panel(new BorderLayout());
         Panel messagePanel = new Panel(new BorderLayout());
         serverPanel.add(serverLabel, BorderLayout.WEST);
@@ -50,6 +52,8 @@ public class EmailClient extends Frame {
         fromPanel.add(fromField, BorderLayout.CENTER);
         toPanel.add(toLabel, BorderLayout.WEST);
         toPanel.add(toField, BorderLayout.CENTER);
+        ccPanel.add(ccLabel, BorderLayout.WEST);
+        ccPanel.add(ccField, BorderLayout.CENTER);
         subjectPanel.add(subjectLabel, BorderLayout.WEST);
         subjectPanel.add(subjectField, BorderLayout.CENTER);
         messagePanel.add(messageLabel, BorderLayout.NORTH);
@@ -58,6 +62,7 @@ public class EmailClient extends Frame {
         fieldPanel.add(serverPanel);
         fieldPanel.add(fromPanel);
         fieldPanel.add(toPanel);
+        fieldPanel.add(ccPanel);
         fieldPanel.add(subjectPanel);
 
         /* Create a panel for the URL field and add listener to the GET 
@@ -118,7 +123,7 @@ public class EmailClient extends Frame {
             /* Create the message */
             EmailMessage mailMessage;
             try {
-                mailMessage = new EmailMessage(fromField.getText(), toField.getText(), subjectField.getText(), messageText.getText(), serverField.getText());
+                mailMessage = new EmailMessage(fromField.getText(), toField.getText(), ccField.getText(),subjectField.getText(), messageText.getText(), serverField.getText());
             } catch (UnknownHostException e) {
                 /* If there is an error, do not go further */
                 return;
@@ -164,7 +169,7 @@ public class EmailClient extends Frame {
              * ******************************************
              */
             HttpInteract request
-                    = new HttpInteract(urlField.getText().trim());
+                    = new HttpInteract(urlField, urlField.getText().trim());
 
             // Send http request. Returned String holds object 
             try {

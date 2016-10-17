@@ -2,13 +2,10 @@ package emailclient;
 
 /**
  * ***********************************
- * Filename: 
- * HttpInteract.java 
- * Names: 
- * Student-IDs: 
- * Date:
+ * Filename: HttpInteract.java Names: Student-IDs: Date:
  * ***********************************
  */
+import java.awt.TextField;
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -27,9 +24,22 @@ public class HttpInteract {
     private static final String CRLF = "\r\n";
     private static final int BUF_SIZE = 4096;
     private static final int MAX_OBJECT_SIZE = 102400;
+    private static final int HTTPS_PORT = 443;
+    private boolean isHTTPS;
+    private TextField tf;
 
     /* Create a HttpInteract object. */
-    public HttpInteract(String url) {
+    public HttpInteract(TextField tf, String url) {
+        this.tf = tf;
+        isHTTPS = false;
+        if (url.startsWith("http://")) {
+            url = url.substring(7);
+        }
+        if (url.startsWith("https://")) {
+            url = url.substring(8);
+            isHTTPS = true;
+        }
+        tf.setText(url);
 
         /* Split the "URL" into "host name" and "path name", and
 		 * set host and path class variables. 
@@ -81,7 +91,11 @@ public class HttpInteract {
 
         /* Connect to http server on port 80.
         * Assign input and output streams to connection. */
-        connection = new Socket(host, HTTP_PORT);
+        if (isHTTPS) {
+            connection = new Socket(host, HTTPS_PORT);
+        } else {
+            connection = new Socket(host, HTTP_PORT);
+        }
         fromServer = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         toServer = new DataOutputStream(connection.getOutputStream());
 
@@ -97,8 +111,13 @@ public class HttpInteract {
 	 * close connection and return an error message. 
 	 * Do NOT throw an exception */
         String[] temp = statusLine.split(" ");
+        boolean needRedirection = false;
         if ((status = Integer.parseInt(temp[1])) != 200) {
-            return ("Error: a failure happend when accruing the file");
+            if (status == 301 || status == 302) {
+                needRedirection = true;
+            } else {
+                return ("Error: a failure happend when accruing the intended file");
+            }
         }
 
         /* Read header lines from response message, convert to a string, 
@@ -109,13 +128,22 @@ public class HttpInteract {
          */
         String headertemp;
         while (!(headertemp = fromServer.readLine()).equals("")) {
+            if (needRedirection) {
+                if (headertemp.contains("Location") || headertemp.contains("location")) {
+                    System.out.println(headertemp);
+                    tmp = headertemp.split(":");
+                    System.out.println((tmp[1] + ":" + tmp[2]).trim());
+                    needRedirection = false;
+                    return new HttpInteract(tf, (tmp[1] + ":" + tmp[2]).trim()).send();
+                }
+            }
             headers += (headertemp + CRLF);
-            if (headertemp.contains("Content-Length:") || headertemp.contains("Content-length:")) {
+            if (headertemp.contains("Content-Length") || headertemp.contains("Content-length")) {
                 tmp = headertemp.split(":");
                 bodyLength = Integer.parseInt(tmp[1].trim());
             }
         }	// requires about 10 lines of code
-        headers = headers.substring(0, (headers.length() - 4));
+        headers = headers.substring(0, (headers.length() - 2));
         System.out.println("Headers:\n" + headers + CRLF);
 
 
@@ -139,12 +167,14 @@ public class HttpInteract {
             return ("No body length info found");
         }
         while (bytesRead < Math.min(bodyLength, MAX_OBJECT_SIZE)) {
+            int length = Math.min(remainBytes, BUF_SIZE);
             try {
-                fromServer.read(buf, 0, Math.min(remainBytes, BUF_SIZE));
+                fromServer.read(buf, 0, length);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.arraycopy(buf, 0, body, bytesRead, Math.min(remainBytes, BUF_SIZE));
+            System.arraycopy(buf, 0, body, bytesRead, length);
+            Arrays.fill(buf, '\0');
             bytesRead += BUF_SIZE;
             remainBytes -= BUF_SIZE;
         }
@@ -153,7 +183,7 @@ public class HttpInteract {
         /* At this points body[] should hold to body of the downloaded object and 
 		 * bytesRead should hold the number of bytes read from the BufferedReader
          */
-        /* Close connection and return object as String. */
+ /* Close connection and return object as String. */
         System.out.println("Done reading file. Closing connection.");
         connection.close();
         return (new String(body, 0, bytesRead));
