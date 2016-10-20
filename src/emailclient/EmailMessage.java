@@ -117,7 +117,7 @@ public class EmailMessage {
             Body += "Content-Type: " + MessageType.TXT + ";" + "charset=UTF-8"+CRLF;
             Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7;
          }
-            Body = (escapeMessage(mainText) + CRLF);
+            Body += (escapeMessage(mainText) + CRLF);
 
             for (SubEmailMessage sem : attechments) {
                 Body += sem.getSubEmailMessage();
