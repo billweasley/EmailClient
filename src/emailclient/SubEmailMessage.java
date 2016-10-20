@@ -31,10 +31,10 @@ public class SubEmailMessage {
     private static final String CRLF = "\r\n";
 
     public SubEmailMessage(File file) {
-        this(encodeAttach(file), getMessageType(file).toString(), file.getName(), EncodingType.BASE64.toString());
+        this(encodeAttach(file), getMessageType(file).toString(), file.getName(), EncodingType.BASE64.toString(), true);
     }
 
-    public SubEmailMessage(String partBody, String type, String fileName, String encoding) {
+    public SubEmailMessage(String partBody, String type, String fileName, String encoding, Boolean isAttachment) {
         this.type = type;
         this.encoding = encoding;
         subEmailMessage = ("--" + boundary + CRLF);
@@ -44,6 +44,9 @@ public class SubEmailMessage {
             subEmailMessage += "Content-Type: " + type + CRLF;
         }
         subEmailMessage += "Content-Transfer-Encoding: " + encoding + CRLF;
+        if (isAttachment) {
+            subEmailMessage += "Content-Disposition: attachment; filename=\"" + fileName + "\"" + CRLF;
+        }
 
         subEmailMessage += CRLF;
         subEmailMessage += (partBody + CRLF);
