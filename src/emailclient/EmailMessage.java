@@ -95,52 +95,51 @@ public class EmailMessage {
         Headers += "Date: " + dateString + CRLF;
 
         String MIME = "MIME-Version: 1.0";
-        String boundary = "\"----=frontier\"";
+        String boundary = "----=frontier";
 
         if (attechments != null) {
             Headers += (MIME + CRLF);
-            Headers += "Content-Type: " + MessageType.MUTI + "; boundary=" + boundary + CRLF;
+            Headers += "Content-Type: " + MessageType.MUTI + "; boundary= \"" + boundary + "\"" + CRLF + CRLF;
         } else {
-            Headers += "Content-Type: " + MessageType.TXT + CRLF;
+            Headers += "Content-Type: " + MessageType.TXT + CRLF + CRLF;
         }
 
         /*
 		 * Get message. We must escape the message to make sure that there are
 		 * no single periods on a line. This would mess up sending the mail.
          */
-     //   if (attechments != null || EmailClient.isHTML) {
-      //      Body = ("--" + boundary + CRLF);
-      //  }
-      //  if (EmailClient.isHTML & EmailClient.recordedWebpageContentType != null) {
-      //      Body += "Content-Type: " + EmailClient.recordedWebpageContentType + "; boundary=" + boundary + CRLF;
-       // } else {
-      //      Body += "Content-Type: " + MessageType.TXT + CRLF;
-      //      Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7;
-      //  }
-        Body = (escapeMessage(mainText) + CRLF+ CRLF);
-     //   if (attechments != null || EmailClient.isHTML) {
-      //      Body += (CRLF + CRLF);
-      //  }
-        for (SubEmailMessage sem : attechments) {
-            Body += sem.getSubEmailMessage();
+        if (attechments != null || EmailClient.isHTML) {
+            Body = ("--" + boundary + CRLF);
+        }
+        if (EmailClient.isHTML & EmailClient.recordedWebpageContentType != null) {
+            Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF;
+        } else {
+            Body += "Content-Type: " + MessageType.TXT + ";" + CRLF;
+            Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7;
+         }
+            Body = (escapeMessage(mainText) + CRLF + CRLF);
+            //   if (attechments != null || EmailClient.isHTML) {
+            //      Body += (CRLF + CRLF);
+            //  }
+            for (SubEmailMessage sem : attechments) {
+                Body += sem.getSubEmailMessage();
+            }
+            /*
+		 * Take the name of the local mailserver and map it into an InetAddress
+             */
+            DestHost = localServer;
+            try {
+                DestAddr = InetAddress.getByName(DestHost);
+            } catch (UnknownHostException e) {
+                System.out.println("Unknown host: " + DestHost);
+                System.out.println(e);
+                throw e;
+            }
         }
         /*
-		 * Take the name of the local mailserver and map it into an InetAddress
-         */
-        DestHost = localServer;
-        try {
-            DestAddr = InetAddress.getByName(DestHost);
-        } catch (UnknownHostException e) {
-            System.out.println("Unknown host: " + DestHost);
-            System.out.println(e);
-            throw e;
-        }
-    }
-
-    /*
 	 * Check whether the message is valid. In other words, check that both
 	 * sender and recipient contain only one @-sign.
-     */
+         */
     public boolean isValid() {
         int fromat;
         int toat;

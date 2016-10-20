@@ -39,7 +39,7 @@ public class SubEmailMessage {
         this.encoding = encoding;
         subEmailMessage = ("--" + boundary + CRLF);
         if (fileName != null) {
-            subEmailMessage += "Content-Type: " + type + ";name=\"" + fileName + "\"" + CRLF;
+            subEmailMessage += "Content-Type: " + type + "; name=\"" + fileName + "\"" + CRLF;
         } else {
             subEmailMessage += "Content-Type: " + type + CRLF;
         }
