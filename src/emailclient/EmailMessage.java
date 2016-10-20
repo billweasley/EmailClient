@@ -114,7 +114,7 @@ public class EmailMessage {
         if (EmailClient.isHTML && EmailClient.recordedWebpageContentType != null) {
             Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF+ CRLF;
         } else {
-            Body += "Content-Type: " + MessageType.TXT + ";" + "charset=UTF-8" + CRLF;
+            Body += "Content-Type: " + MessageType.TXT + ";" + "charset=UTF-8" + CRLF+ CRLF;
         }
         Body += (escapeMessage(mainText) + CRLF + CRLF);
 
