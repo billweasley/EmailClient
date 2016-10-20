@@ -26,27 +26,27 @@ public class SubEmailMessage {
 
     private final String encoding;
 
-    private String subEmailMessage = "";
-    public static final String boundary = "frontier";
+    private String subEmailMessage;
+    public static final String boundary = "----=frontier";
     private static final String CRLF = "\r\n";
 
     public SubEmailMessage(File file) {
-        this(encodeAttach(file), getMessageType(file).toString(), EncodingType.BASE64.toString());
+        this(encodeAttach(file), getMessageType(file).toString(), file.getName(), EncodingType.BASE64.toString());
     }
 
-    public SubEmailMessage(String partBody, String type, String encoding) {
+    public SubEmailMessage(String partBody, String type, String fileName, String encoding) {
         this.type = type;
         this.encoding = encoding;
-        subEmailMessage += ("--" + boundary + CRLF);
-        subEmailMessage += "Content-Type: " + type + "; boundary=" + boundary + CRLF;
-        subEmailMessage += "Content-Transfer-Encoding: " + type + CRLF;
-
-        if (encoding != null) {
-            subEmailMessage += (encoding + CRLF);
+        subEmailMessage = ("--" + boundary + CRLF);
+        if (fileName != null) {
+            subEmailMessage += "Content-Type: " + type + ";name=\"" + fileName + "\"" + CRLF;
+        } else {
+            subEmailMessage += "Content-Type: " + type + CRLF;
         }
+        subEmailMessage += "Content-Transfer-Encoding: " + encoding + CRLF;
+
         subEmailMessage += CRLF;
-        subEmailMessage += (partBody + CRLF + CRLF);
-        subEmailMessage += "--" + boundary + CRLF;
+        subEmailMessage += (partBody + CRLF);
     }
 
     public String getType() {
@@ -58,7 +58,7 @@ public class SubEmailMessage {
     }
 
     public String getSubEmailMessage() {
-        return subEmailMessage;
+        return subEmailMessage + "--" + boundary + "--";
     }
 
     public static String encodeAttach(File file) {

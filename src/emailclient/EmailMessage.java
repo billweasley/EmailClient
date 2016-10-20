@@ -95,7 +95,7 @@ public class EmailMessage {
         Headers += "Date: " + dateString + CRLF;
 
         String MIME = "MIME-Version: 1.0";
-        String boundary = "frontier";
+        String boundary = "\"----=frontier\"";
 
         if (attechments != null) {
             Headers += (MIME + CRLF);
@@ -108,19 +108,19 @@ public class EmailMessage {
 		 * Get message. We must escape the message to make sure that there are
 		 * no single periods on a line. This would mess up sending the mail.
          */
-        if (attechments != null || EmailClient.isHTML) {
-            Body += ("--" + boundary + CRLF);
-        }
-        if (EmailClient.isHTML & EmailClient.recordedWebpageContentType != null) {
-            Body += "Content-Type: " + EmailClient.recordedWebpageContentType + "; boundary=" + boundary + CRLF;
-        } else {
-            Body += "Content-Type: " + MessageType.TXT + CRLF;
-            Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7;
-        }
-        Body += (escapeMessage(mainText) + CRLF);
-        if (attechments != null || EmailClient.isHTML) {
-            Body += (CRLF + CRLF);
-        }
+     //   if (attechments != null || EmailClient.isHTML) {
+      //      Body = ("--" + boundary + CRLF);
+      //  }
+      //  if (EmailClient.isHTML & EmailClient.recordedWebpageContentType != null) {
+      //      Body += "Content-Type: " + EmailClient.recordedWebpageContentType + "; boundary=" + boundary + CRLF;
+       // } else {
+      //      Body += "Content-Type: " + MessageType.TXT + CRLF;
+      //      Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7;
+      //  }
+        Body = (escapeMessage(mainText) + CRLF);
+     //   if (attechments != null || EmailClient.isHTML) {
+      //      Body += (CRLF + CRLF);
+      //  }
         for (SubEmailMessage sem : attechments) {
             Body += sem.getSubEmailMessage();
         }
