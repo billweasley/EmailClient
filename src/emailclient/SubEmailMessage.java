@@ -31,7 +31,7 @@ public class SubEmailMessage {
     private static final String CRLF = "\r\n";
 
     public SubEmailMessage(File file) {
-        this(encodeAttach(file), getMessageType(file).toString(), file.getName(), EncodingType.BASE64.toString(), true);
+        this(encodeAttach(file), getMessageType(file).toString(), new BASE64Encoder().encode(file.getName().getBytes()), EncodingType.BASE64.toString(), true);
     }
 
     public SubEmailMessage(String partBody, String type, String fileName, String encoding, Boolean isAttachment) {
