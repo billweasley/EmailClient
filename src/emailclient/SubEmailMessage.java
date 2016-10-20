@@ -26,7 +26,7 @@ public class SubEmailMessage {
 
     private final String encoding;
 
-    private String subEmailMessage;
+    private String subEmailMessage = "";
     public static final String boundary = "frontier";
     private static final String CRLF = "\r\n";
 
@@ -45,7 +45,7 @@ public class SubEmailMessage {
             subEmailMessage += (encoding + CRLF);
         }
         subEmailMessage += CRLF;
-        subEmailMessage += (partBody + CRLF);
+        subEmailMessage += (partBody + CRLF + CRLF);
         subEmailMessage += "--" + boundary + CRLF;
     }
 
