@@ -108,36 +108,37 @@ public class EmailMessage {
 		 * Get message. We must escape the message to make sure that there are
 		 * no single periods on a line. This would mess up sending the mail.
          */
-      //  if (attechments != null || EmailClient.isHTML) {
+        if (attechments != null || EmailClient.isHTML) {
             Body = "--" + boundary + CRLF;
-        //}
+        }
         if (EmailClient.isHTML && EmailClient.recordedWebpageContentType != null) {
             Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF;
         } else {
-            Body += "Content-Type: " + MessageType.TXT + ";" + "charset=UTF-8"+CRLF;
-            Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7+CRLF;
-         }
-            Body += (escapeMessage(mainText) + CRLF);
+            Body += "Content-Type: " + MessageType.TXT + ";" + "charset=UTF-8" + CRLF;
+            Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7.toString() + CRLF+ CRLF;
+        }
+        Body += (escapeMessage(mainText) + CRLF + CRLF);
 
-            for (SubEmailMessage sem : attechments) {
-                Body += sem.getSubEmailMessage();
-            }
-            /*
-		 * Take the name of the local mailserver and map it into an InetAddress
-             */
-            DestHost = localServer;
-            try {
-                DestAddr = InetAddress.getByName(DestHost);
-            } catch (UnknownHostException e) {
-                System.out.println("Unknown host: " + DestHost);
-                System.out.println(e);
-                throw e;
-            }
+        for (SubEmailMessage sem : attechments) {
+            Body += sem.getSubEmailMessage();
         }
         /*
+		 * Take the name of the local mailserver and map it into an InetAddress
+         */
+        DestHost = localServer;
+        try {
+            DestAddr = InetAddress.getByName(DestHost);
+        } catch (UnknownHostException e) {
+            System.out.println("Unknown host: " + DestHost);
+            System.out.println(e);
+            throw e;
+        }
+    }
+
+    /*
 	 * Check whether the message is valid. In other words, check that both
 	 * sender and recipient contain only one @-sign.
-         */
+     */
     public boolean isValid() {
         int fromat;
         int toat;
