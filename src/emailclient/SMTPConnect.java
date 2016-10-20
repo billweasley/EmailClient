@@ -74,7 +74,7 @@ public class SMTPConnect {
         }
         cammand = "DATA" + CRLF;
         sendCommand(cammand, 354);
-        cammand = mailmessage.getHeaders() + CRLF + mailmessage.getBody() + CRLF + "." + CRLF;
+        cammand = mailmessage.getHeaders() + mailmessage.getBody() + CRLF + "." + CRLF;
         sendCommand(cammand, 250);
 
     }
