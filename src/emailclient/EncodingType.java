@@ -10,7 +10,7 @@ package emailclient;
  * @author haoxuan
  */
 public enum EncodingType {
-    BASE64("BASE64"), QP("QUOTED-PRINTABLE"), ASCII_8("8BIT"), ASCII_7("7BIT"), BINARY("BINARY");
+    BASE64("base64"), QP("quoted-printable"), ASCII_8("8BIT"), ASCII_7("7BIT"), BINARY("binary");
     private String typeName;
 
     @Override

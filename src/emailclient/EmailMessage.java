@@ -99,7 +99,7 @@ public class EmailMessage {
 
         if (attechments != null) {
             Headers += (MIME + CRLF);
-            Headers += "Content-Type: " + MessageType.MUTI + "; boundary= \"" + boundary + "\"" + CRLF + CRLF;
+            Headers += "Content-Type: " + MessageType.MUTI + "; \n\tboundary= \"" + boundary + "\"" + CRLF + CRLF;
         } else {
             Headers += "Content-Type: " + MessageType.TXT + CRLF + CRLF;
         }
@@ -118,9 +118,7 @@ public class EmailMessage {
             Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7;
          }
             Body = (escapeMessage(mainText) + CRLF + CRLF);
-            //   if (attechments != null || EmailClient.isHTML) {
-            //      Body += (CRLF + CRLF);
-            //  }
+
             for (SubEmailMessage sem : attechments) {
                 Body += sem.getSubEmailMessage();
             }

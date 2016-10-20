@@ -49,7 +49,7 @@ public class SubEmailMessage {
         }
 
         subEmailMessage += CRLF;
-        subEmailMessage += (partBody + CRLF+ CRLF);
+        subEmailMessage += (partBody + CRLF);
     }
 
     public String getType() {
