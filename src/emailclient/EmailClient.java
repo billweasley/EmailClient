@@ -34,7 +34,7 @@ public class EmailClient extends Frame {
     private Button btGet = new Button("Get");
 
     private Label attachmentLabel = new Label("Attachment:");
-    private TextField attachmentField = new TextField("", 200);
+    private TextField attachmentField = new TextField("", 100);
     private Button btAddAttach = new Button("Add an attachment");
     private Button btClearAttach = new Button("Clear all attachments");
 
