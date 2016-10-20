@@ -109,7 +109,7 @@ public class EmailMessage {
 		 * no single periods on a line. This would mess up sending the mail.
          */
         if (attechments != null || EmailClient.isHTML) {
-            Body = ("--" + boundary + CRLF);
+            Body = "--" + boundary + CRLF;
         }
         if (EmailClient.isHTML & EmailClient.recordedWebpageContentType != null) {
             Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF;
@@ -117,7 +117,7 @@ public class EmailMessage {
             Body += "Content-Type: " + MessageType.TXT + ";" + CRLF;
             Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7;
          }
-            Body = (escapeMessage(mainText) + CRLF + CRLF);
+            Body = (escapeMessage(mainText) + CRLF);
 
             for (SubEmailMessage sem : attechments) {
                 Body += sem.getSubEmailMessage();
