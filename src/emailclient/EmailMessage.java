@@ -117,7 +117,7 @@ public class EmailMessage {
       //      Body += "Content-Type: " + MessageType.TXT + CRLF;
       //      Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7;
       //  }
-        Body = (escapeMessage(mainText) + CRLF);
+        Body = (escapeMessage(mainText) + CRLF+ CRLF);
      //   if (attechments != null || EmailClient.isHTML) {
       //      Body += (CRLF + CRLF);
       //  }
