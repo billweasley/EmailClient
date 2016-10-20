@@ -112,10 +112,9 @@ public class EmailMessage {
             Body = "--" + boundary + CRLF;
         }
         if (EmailClient.isHTML && EmailClient.recordedWebpageContentType != null) {
-            Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF;
+            Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF+ CRLF;
         } else {
             Body += "Content-Type: " + MessageType.TXT + ";" + "charset=UTF-8" + CRLF;
-            Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7.toString() + CRLF+ CRLF;
         }
         Body += (escapeMessage(mainText) + CRLF + CRLF);
 
