@@ -96,18 +96,22 @@ public class EmailMessage {
 
         String MIME = "MIME-Version: 1.0";
         String boundary = "frontier";
-        Body += (MIME + CRLF);
-        if (EmailClient.isHTML & EmailClient.recordedWebpageContentType != null) {
-            Body += "Content-Type: " + EmailClient.recordedWebpageContentType + "; boundary=" + boundary + CRLF;
-        } else {
-            Body += "Content-Type: " + EncodingType.ASCII_7 + "; boundary=" + boundary + CRLF;
+        Headers += (MIME + CRLF);
+        if (attechments != null) {
+            Headers += "Content-Type: " + MessageType.MUTI + "; boundary=" + boundary + CRLF;
+        } else if (EmailClient.isHTML & EmailClient.recordedWebpageContentType != null) {
+            Headers += "Content-Type: " + EmailClient.recordedWebpageContentType + "; boundary=" + boundary + CRLF;
+        }else{
+             Headers += "Content-Type: " + MessageType.TXT + "; boundary=" + boundary + CRLF;
         }
 
         /*
 		 * Get message. We must escape the message to make sure that there are
 		 * no single periods on a line. This would mess up sending the mail.
          */
+        Body += ("--" + boundary + CRLF);
         Body += escapeMessage(mainText);
+        
         for (SubEmailMessage sem : attechments) {
             Body += sem.getSubEmailMessage();
         }

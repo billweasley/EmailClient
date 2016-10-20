@@ -37,7 +37,8 @@ public class SubEmailMessage {
     public SubEmailMessage(String partBody, String type, String encoding) {
         this.type = type;
         this.encoding = encoding;
-
+        subEmailMessage += ("--" + boundary + CRLF);
+        subEmailMessage += "Content-Type: " + type + "; boundary=" + boundary + CRLF;
         subEmailMessage += "Content-Transfer-Encoding: " + type + CRLF;
 
         if (encoding != null) {
