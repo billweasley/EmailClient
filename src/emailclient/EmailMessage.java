@@ -2,7 +2,7 @@ package emailclient;
 
 /**
  * ***********************************
- * Filename: EmailMessage.java ***********************************
+ * Filename: EmailMessage.java * ***********************************
  */
 import java.util.*;
 import java.net.InetAddress;
@@ -63,7 +63,7 @@ public class EmailMessage {
 	 * Create the message object by inserting the required headers from RFC 822
 	 * (From, To, Date).
      */
-    public EmailMessage(String from, String to, String cc, String subject, String text,
+    public EmailMessage(String from, String to, String cc, String subject, String mainText, List<SubEmailMessage> attechments,
             String localServer) throws UnknownHostException {
         /* Remove whitespace */
         Sender = from.trim();
@@ -85,8 +85,7 @@ public class EmailMessage {
         }
         Headers += CRLF;
 
-        Headers += "Subject: " + subject.trim() + CRLF;
-
+        Headers += ("Subject: " + subject.trim() + CRLF);
         /*
 		 * A close approximation of the required format. Unfortunately only GMT.
          */
@@ -95,12 +94,23 @@ public class EmailMessage {
         String dateString = format.format(new Date());
         Headers += "Date: " + dateString + CRLF;
 
+        String MIME = "MIME-Version: 1.0";
+        String boundary = "frontier";
+        Body += (MIME + CRLF);
+        if (EmailClient.isHTML & EmailClient.recordedWebpageContentType != null) {
+            Body += "Content-Type: " + EmailClient.recordedWebpageContentType + "; boundary=" + boundary + CRLF;
+        } else {
+            Body += "Content-Type: " + EncodingType.ASCII_7 + "; boundary=" + boundary + CRLF;
+        }
+
         /*
 		 * Get message. We must escape the message to make sure that there are
 		 * no single periods on a line. This would mess up sending the mail.
          */
-        Body = escapeMessage(text);
-
+        Body += escapeMessage(mainText);
+        for (SubEmailMessage sem : attechments) {
+            Body += sem.getSubEmailMessage();
+        }
         /*
 		 * Take the name of the local mailserver and map it into an InetAddress
          */
@@ -164,7 +174,7 @@ public class EmailMessage {
         String res;
 
         res = "Sender: " + Sender + '\n';
-        
+
         res += "To: ";
         for (String rec : Recipients) {
             res += (rec + ",");
@@ -176,7 +186,7 @@ public class EmailMessage {
             res += (rec + ",");
         }
         res += '\n';
-        
+
         res += "MX-host: " + DestHost + ", address: " + DestAddr + '\n';
         res += "Message:" + '\n';
         res += Headers + CRLF;

@@ -2,14 +2,14 @@ package emailclient;
 
 /**
  * ***********************************
- * Filename: EmailClient.java 
- * Date: 
- * ***********************************
+ * Filename: EmailClient.java Date: ***********************************
  */
 import java.io.*;
 import java.net.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.JFileChooser;
+import java.util.ArrayList;
 
 public class EmailClient extends Frame {
 
@@ -33,6 +33,19 @@ public class EmailClient extends Frame {
     private TextField urlField = new TextField("cgi.csc.liv.ac.uk/~gairing/test.txt", 40);
     private Button btGet = new Button("Get");
 
+    private Label attachmentLabel = new Label("Attachment:");
+    private TextField attachmentField = new TextField("", 200);
+    private Button btAddAttach = new Button("Add an attachment");
+    private Button btClearAttach = new Button("Clear all attachments");
+
+    private JFileChooser chooser = new JFileChooser();
+    private final ArrayList<File> ATTACHES = new ArrayList<>();
+    private final ArrayList<SubEmailMessage> SUBBODIES = new ArrayList<>();
+
+    public static String recordedWebpageContentType;
+    public static String recordedWebpageContentEncoding;
+    public static boolean isHTML = false;
+
     /**
      * Create a new EmailClient window with fields for entering all the relevant
      * information (From, To, Subject, and message).
@@ -48,6 +61,8 @@ public class EmailClient extends Frame {
         Panel ccPanel = new Panel(new BorderLayout());
         Panel subjectPanel = new Panel(new BorderLayout());
         Panel messagePanel = new Panel(new BorderLayout());
+        Panel attechmentPanel = new Panel(new FlowLayout());
+
         serverPanel.add(serverLabel, BorderLayout.WEST);
         serverPanel.add(serverField, BorderLayout.CENTER);
         fromPanel.add(fromLabel, BorderLayout.WEST);
@@ -60,6 +75,7 @@ public class EmailClient extends Frame {
         subjectPanel.add(subjectField, BorderLayout.CENTER);
         messagePanel.add(messageLabel, BorderLayout.NORTH);
         messagePanel.add(messageText, BorderLayout.CENTER);
+
         Panel fieldPanel = new Panel(new GridLayout(0, 1));
         fieldPanel.add(serverPanel);
         fieldPanel.add(fromPanel);
@@ -76,6 +92,14 @@ public class EmailClient extends Frame {
         fieldPanel.add(urlPanel);
         btGet.addActionListener(new GetListener());
 
+        attachmentField.setEditable(false);
+        attechmentPanel.add(attachmentLabel, FlowLayout.LEFT);
+        attechmentPanel.add(attachmentField, FlowLayout.CENTER);
+        attechmentPanel.add(btClearAttach, FlowLayout.RIGHT);
+        attechmentPanel.add(btAddAttach, FlowLayout.RIGHT);
+        fieldPanel.add(attechmentPanel);
+        btClearAttach.addActionListener(new ClearAttachListener());
+        btAddAttach.addActionListener(new AddListener());
 
         /* Create a panel for the buttons and add listeners to the
 	   buttons. */
@@ -96,7 +120,6 @@ public class EmailClient extends Frame {
     }
 
     static public void main(String argv[]) {
-        System.out.println(new DefaltLocalSender());
         new EmailClient();
     }
 
@@ -122,11 +145,15 @@ public class EmailClient extends Frame {
                 System.out.println("Need recipient!");
                 return;
             }
-
+            if (!attachmentField.getText().equals("")) {
+                for (File file : ATTACHES) {
+                    SUBBODIES.add(new SubEmailMessage(file));
+                }
+            }
             /* Create the message */
             EmailMessage mailMessage;
             try {
-                mailMessage = new EmailMessage(fromField.getText(), toField.getText(), ccField.getText(),subjectField.getText(), messageText.getText(), serverField.getText());
+                mailMessage = new EmailMessage(fromField.getText(), toField.getText(), ccField.getText(), subjectField.getText(), messageText.getText(), SUBBODIES, serverField.getText());
             } catch (UnknownHostException e) {
                 /* If there is an error, do not go further */
                 return;
@@ -137,7 +164,6 @@ public class EmailClient extends Frame {
             if (!mailMessage.isValid()) {
                 return;
             }
-
             try {
                 SMTPConnect connection = new SMTPConnect(mailMessage);
                 connection.send(mailMessage);
@@ -183,7 +209,7 @@ public class EmailClient extends Frame {
                 return;
             } // Change message text
             messageText.setText(receivedText);
-
+            isHTML = true;
         }
     }
 
@@ -198,6 +224,12 @@ public class EmailClient extends Frame {
             ccField.setText("");
             subjectField.setText("");
             messageText.setText("");
+            attachmentField.setText("");
+            recordedWebpageContentType = null;
+            recordedWebpageContentEncoding = null;
+            isHTML = false;
+            ATTACHES.clear();
+
         }
     }
 
@@ -208,5 +240,31 @@ public class EmailClient extends Frame {
         public void actionPerformed(ActionEvent e) {
             System.exit(0);
         }
+    }
+
+    class AddListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            chooser.setBounds(400, 200, 800, 800);
+            chooser.showOpenDialog(chooser);
+            chooser.setVisible(true);
+            ATTACHES.add(chooser.getSelectedFile());
+            String temp = "";
+            for (File a : ATTACHES) {
+                temp += (a.getName() + "\t\t");
+            }
+            attachmentField.setText(temp);
+        }
+    }
+
+    class ClearAttachListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ATTACHES.clear();
+            attachmentField.setText("");
+        }
+
     }
 }
