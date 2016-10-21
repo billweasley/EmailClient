@@ -99,7 +99,7 @@ public class EmailMessage {
         if (attechments != null) {
             Headers += ("MIME-Version: 1.0" + CRLF);
             Headers += ("Content-Type: " + MessageType.MUTI.toString() + ";" + CRLF);
-            Headers += "\"boundary=" + boundary + "\"" + CRLF + CRLF;
+            Headers += "boundary=\"" + boundary + "\"" + CRLF + CRLF;
         } else {
             Headers += "Content-Type: " + MessageType.TXT + CRLF + CRLF;
         }
@@ -108,8 +108,12 @@ public class EmailMessage {
 		 * Get message. We must escape the message to make sure that there are
 		 * no single periods on a line. This would mess up sending the mail.
          */
+        if (!mainText.isEmpty()) {
+            Body = "Content-Type: multipart/alternative" + CRLF;
+            Body += "boundary=\"" + boundary + "\"" + CRLF + CRLF;
+        }
         if (attechments != null || EmailClient.isHTML) {
-            Body = "--" + boundary + CRLF + CRLF;
+            Body += ("--" + boundary + CRLF);
         }
         if (EmailClient.isHTML && EmailClient.recordedWebpageContentType != null) {
             Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF + CRLF;
@@ -117,7 +121,7 @@ public class EmailMessage {
             Body += "Content-Type: " + MessageType.TXT.toString() + ";" + CRLF + "charset=UTF-8" + CRLF;
             Body += "Content-Transfer-Encoding:" + EncodingType.ASCII_7.toString() + CRLF + CRLF;
         }
-        Body += (escapeMessage(mainText) + CRLF + CRLF);
+        Body += (escapeMessage(mainText) + CRLF + boundary + "--");
 
         for (SubEmailMessage sem : attechments) {
             Body += sem.getSubEmailMessage();
