@@ -110,7 +110,7 @@ public class EmailMessage {
          */
         if (!mainText.isEmpty()) {
             Body += ("--" + boundary + CRLF);
-            Body = "Content-Type: multipart/alternative;" + "\n\t";
+            Body += "Content-Type: multipart/alternative;" + "\n\t";
             Body += "boundary=\"" + boundary + "\"" + CRLF + CRLF;
         }
         if (attechments != null || EmailClient.isHTML) {
