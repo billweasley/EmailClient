@@ -165,6 +165,7 @@ public class EmailClient extends Frame {
                 return;
             }
             try {
+                System.out.println(mailMessage.getBody());
                 SMTPConnect connection = new SMTPConnect(mailMessage);
                 connection.send(mailMessage);
                 connection.close();

@@ -98,7 +98,7 @@ public class EmailMessage {
 
         if (attechments != null) {
             Headers += ("MIME-Version: 1.0" + CRLF);
-            Headers += ("Content-Type: " + MessageType.MUTI.toString() + ";" + CRLF);
+            Headers += ("Content-Type: " + MessageType.MUTI.toString() + ";" + "\n\t");
             Headers += "boundary=\"" + boundary + "\"" + CRLF + CRLF;
         } else {
             Headers += "Content-Type: " + MessageType.TXT + CRLF + CRLF;
@@ -121,7 +121,7 @@ public class EmailMessage {
             Body += "Content-Type: " + MessageType.TXT.toString() + ";" + CRLF + "charset=UTF-8" + CRLF;
             Body += "Content-Transfer-Encoding:" + EncodingType.ASCII_7.toString() + CRLF + CRLF;
         }
-        Body += (escapeMessage(mainText) + CRLF + boundary + "--");
+        Body += (escapeMessage(mainText) + CRLF + boundary + "--"+ CRLF+ CRLF);
 
         for (SubEmailMessage sem : attechments) {
             Body += sem.getSubEmailMessage();
