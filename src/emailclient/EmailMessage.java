@@ -121,7 +121,7 @@ public class EmailMessage {
             Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF + CRLF;
         } else {
             Body += "Content-Type: " + MessageType.TXT.toString() + ";" + CRLF + "charset=UTF-8" + CRLF;
-            Body += "Content-Transfer-Encoding:" + EncodingType.ASCII_7.toString() + CRLF + CRLF;
+            Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7.toString() + CRLF + CRLF;
         }
         Body += (escapeMessage(mainText) + CRLF + "--"+ boundary + "--"+ CRLF+ CRLF);
 

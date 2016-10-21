@@ -36,7 +36,7 @@ public class SubEmailMessage {
     public SubEmailMessage(String partBody, String type, String fileName, String encoding, Boolean isAttachment, String charset) {
         this.type = type;
         this.encoding = encoding;
-        subEmailMessage = ("--" + boundary + CRLF);
+        subEmailMessage = (CRLF+ "--" + boundary + CRLF);
         if (fileName != null) {
             subEmailMessage += "Content-Type: " + type + ";" + CRLF + "name=\"" + fileName + "\"" + CRLF;
         } else {
