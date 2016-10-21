@@ -109,7 +109,8 @@ public class EmailMessage {
 		 * no single periods on a line. This would mess up sending the mail.
          */
         if (!mainText.isEmpty()) {
-            Body = "Content-Type: multipart/alternative" + CRLF;
+            Body += ("--" + boundary + CRLF);
+            Body = "Content-Type: multipart/alternative;" + "\n\t";
             Body += "boundary=\"" + boundary + "\"" + CRLF + CRLF;
         }
         if (attechments != null || EmailClient.isHTML) {
