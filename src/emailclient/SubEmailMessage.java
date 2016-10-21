@@ -21,49 +21,49 @@ import sun.misc.BASE64Encoder;
  * @author haoxuan
  */
 public class SubEmailMessage {
-
+    
     private final String type;
-
+    
     private final String encoding;
-
+    
     private String subEmailMessage;
     public static final String boundary = "----=frontier";
     private static final String CRLF = "\r\n";
-
+    
     public SubEmailMessage(File file) {
         this(encodeAttach(file), getMessageType(file).toString(), new BASE64Encoder().encode(file.getName().getBytes()), EncodingType.BASE64.toString(), true);
     }
-
+    
     public SubEmailMessage(String partBody, String type, String fileName, String encoding, Boolean isAttachment) {
         this.type = type;
         this.encoding = encoding;
         subEmailMessage = ("--" + boundary + CRLF);
         if (fileName != null) {
-            subEmailMessage += "Content-Type: " + type + "; name=\"" + fileName + "\"" + CRLF;
+            subEmailMessage += "Content-Type: " + type + ";" + CRLF + "name=\"" + fileName + "\"" + CRLF;
         } else {
             subEmailMessage += "Content-Type: " + type + CRLF;
         }
         subEmailMessage += "Content-Transfer-Encoding: " + encoding + CRLF;
         if (isAttachment) {
-            subEmailMessage += "Content-Disposition: attachment; filename=\"" + fileName + "\"" + CRLF;
+            subEmailMessage += "Content-Disposition: attachment;" + CRLF + "filename=\"" + fileName + "\"" + CRLF;
         }
-
+        
         subEmailMessage += CRLF;
-        subEmailMessage += (partBody + CRLF+ CRLF);
+        subEmailMessage += (partBody + CRLF + CRLF);
     }
-
+    
     public String getType() {
         return type;
     }
-
+    
     public String getEncoding() {
         return encoding;
     }
-
+    
     public String getSubEmailMessage() {
-        return subEmailMessage + "--" + boundary + "--";
+        return subEmailMessage.substring(0, subEmailMessage.length() - 2) + "--" + boundary + "--";
     }
-
+    
     public static String encodeAttach(File file) {
         byte[] data = null;
         try {
@@ -80,7 +80,7 @@ public class SubEmailMessage {
         }
         return new BASE64Encoder().encode(data);
     }
-
+    
     public static MessageType getMessageType(File file) {
         String affix = "";
         String filename = file.getName();

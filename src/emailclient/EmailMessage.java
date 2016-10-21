@@ -94,12 +94,12 @@ public class EmailMessage {
         String dateString = format.format(new Date());
         Headers += "Date: " + dateString + CRLF;
 
-        String MIME = "MIME-Version: 1.0";
         String boundary = "----=frontier";
 
         if (attechments != null) {
-            Headers += (MIME + CRLF);
-            Headers += "Content-Type: " + MessageType.MUTI + "; \n\tboundary= \"" + boundary + "\"" + CRLF + CRLF;
+            Headers += ("MIME-Version: 1.0" + CRLF);
+            Headers += ("Content-Type: " + MessageType.MUTI.toString() + ";" + CRLF);
+            Headers += "\"boundary=" + boundary + "\"" + CRLF + CRLF;
         } else {
             Headers += "Content-Type: " + MessageType.TXT + CRLF + CRLF;
         }
@@ -109,12 +109,13 @@ public class EmailMessage {
 		 * no single periods on a line. This would mess up sending the mail.
          */
         if (attechments != null || EmailClient.isHTML) {
-            Body = "--" + boundary + CRLF;
+            Body = "--" + boundary + CRLF + CRLF;
         }
         if (EmailClient.isHTML && EmailClient.recordedWebpageContentType != null) {
-            Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF+ CRLF;
+            Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF + CRLF;
         } else {
-            Body += "Content-Type: " + MessageType.TXT + ";" + "charset=UTF-8" + CRLF+ CRLF;
+            Body += "Content-Type: " + MessageType.TXT.toString() + ";" + CRLF + "charset=UTF-8" + CRLF;
+            Body += "Content-Transfer-Encoding:" + EncodingType.ASCII_7.toString() + CRLF + CRLF;
         }
         Body += (escapeMessage(mainText) + CRLF + CRLF);
 
