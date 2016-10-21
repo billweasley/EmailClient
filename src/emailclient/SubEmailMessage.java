@@ -5,36 +5,35 @@
  */
 package emailclient;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sun.misc.BASE64Encoder;
 
 /**
  *
  * @author haoxuan
  */
 public class SubEmailMessage {
-    
+
     private final String type;
-    
+
     private final String encoding;
-    
+
     private String subEmailMessage;
     public static final String boundary = "----=frontier";
     private static final String CRLF = "\r\n";
-    
+
     public SubEmailMessage(File file) {
-        this(encodeAttach(file), getMessageType(file).toString(), new BASE64Encoder().encode(file.getName().getBytes()), EncodingType.BASE64.toString(), true);
+        this(encodeAttach(file), getMessageType(file).toString(), file.getName(), EncodingType.BASE64.toString(), true, "UTF-8");
     }
-    
-    public SubEmailMessage(String partBody, String type, String fileName, String encoding, Boolean isAttachment) {
+
+    public SubEmailMessage(String partBody, String type, String fileName, String encoding, Boolean isAttachment, String charset) {
         this.type = type;
         this.encoding = encoding;
         subEmailMessage = ("--" + boundary + CRLF);
@@ -47,23 +46,23 @@ public class SubEmailMessage {
         if (isAttachment) {
             subEmailMessage += "Content-Disposition: attachment;" + CRLF + "filename=\"" + fileName + "\"" + CRLF;
         }
-        
+
         subEmailMessage += CRLF;
         subEmailMessage += (partBody + CRLF + CRLF);
     }
-    
+
     public String getType() {
         return type;
     }
-    
+
     public String getEncoding() {
         return encoding;
     }
-    
+
     public String getSubEmailMessage() {
         return subEmailMessage.substring(0, subEmailMessage.length() - 2) + "--" + boundary + "--";
     }
-    
+
     public static String encodeAttach(File file) {
         byte[] data = null;
         try {
@@ -78,9 +77,15 @@ public class SubEmailMessage {
             ex.printStackTrace();
             return ("Failure on encoding: " + file.getName());
         }
-        return new BASE64Encoder().encode(data);
+
+        try {
+            return new String(Base64.getMimeEncoder().encode(data), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
-    
+
     public static MessageType getMessageType(File file) {
         String affix = "";
         String filename = file.getName();
