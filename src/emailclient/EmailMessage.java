@@ -95,7 +95,7 @@ public class EmailMessage {
         Headers += "Date: " + dateString + CRLF;
 
         String boundary = "----=frontier";
-
+        String suboundary = "----=subfrontier";
         if (attechments != null) {
             Headers += ("MIME-Version: 1.0" + CRLF);
             Headers += ("Content-Type: " + MessageType.MUTI.toString() + ";" + "\n\t");
@@ -112,10 +112,10 @@ public class EmailMessage {
         if (!mainText.isEmpty()) {
             Body += ("--" + boundary + CRLF);
             Body += "Content-Type: multipart/alternative;" + "\n\t";
-            Body += "boundary=\"" + boundary + "\"" + CRLF + CRLF;
+            Body += "boundary=\"" + suboundary + "\"" + CRLF + CRLF;
         }
         if (attechments != null || EmailClient.isHTML) {
-            Body += ("--" + boundary + CRLF);
+            Body += ("--" + suboundary + CRLF);
         }
         if (EmailClient.isHTML && EmailClient.recordedWebpageContentType != null) {
             Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF + CRLF;
@@ -123,7 +123,7 @@ public class EmailMessage {
             Body += "Content-Type: " + MessageType.TXT.toString() + ";" + CRLF + "charset=UTF-8" + CRLF;
             Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7.toString() + CRLF + CRLF;
         }
-        Body += (escapeMessage(mainText) + CRLF + "--"+ boundary + "--"+ CRLF+ CRLF);
+        Body += (escapeMessage(mainText) + CRLF + "--"+ suboundary + "--"+ CRLF+ CRLF);
 
         for (SubEmailMessage sem : attechments) {
             Body += sem.getSubEmailMessage();
