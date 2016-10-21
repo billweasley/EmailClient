@@ -78,12 +78,7 @@ public class SubEmailMessage {
             return ("Failure on encoding: " + file.getName());
         }
 
-        try {
-            return new String(Base64.getMimeEncoder().encode(data), "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace();
-        }
-        return null;
+        return new String(Base64.getMimeEncoder().encode(data));
     }
 
     public static MessageType getMessageType(File file) {
