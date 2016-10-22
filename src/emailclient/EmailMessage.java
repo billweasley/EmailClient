@@ -87,7 +87,7 @@ public class EmailMessage {
         Headers = Headers.substring(0, Headers.length() - 1);
         Headers += CRLF;
 
-        if (Ccs.length != 0) {
+        if (!CcList.equals("")) {
             Headers += "Cc: ";
             for (String rec : Ccs) {
                 Headers += (rec + ",");
@@ -106,7 +106,7 @@ public class EmailMessage {
         String dateString = format.format(new Date());
         Headers += ("Date: " + dateString + CRLF);
 
-        if (attechments != null) {
+        if (!attechments.isEmpty()) {
             Headers += ("MIME-Version: 1.0" + CRLF);
             Headers += ("Content-Type: " + MessageType.MUTI.toString() + "; ");
             Headers += ("boundary=" + BOUNDARY + CRLF);
