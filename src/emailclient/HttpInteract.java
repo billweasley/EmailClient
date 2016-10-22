@@ -96,7 +96,11 @@ public class HttpInteract {
         /* Send requestMessage to http server */
         toServer.writeBytes(requestMessage);
         /* Read the status line from response message */
-        statusLine = fromServer.readLine();
+        try {
+            statusLine = fromServer.readLine();
+        } catch (IOException ioe) {
+            return ("Error: a failure happend when accessing the address");
+        }
         System.out.println("Status Line:\n" + statusLine + CRLF);
 
         /* Extract status code from status line. If status code is not 200,
