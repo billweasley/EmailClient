@@ -106,7 +106,13 @@ public class HttpInteract {
         /* Extract status code from status line. If status code is not 200,
 	 * close connection and return an error message. 
 	 * Do NOT throw an exception */
-        String[] temp = statusLine.split(" ");
+        String[] temp;
+        try {
+            temp = statusLine.split(" ");;
+        } catch (NullPointerException ne) {
+            return ("Error: a failure happend when accessing the address");
+        }
+
         boolean needRedirection = false;
         if ((status = Integer.parseInt(temp[1])) != 200) {
             if (status == 301 || status == 302) {
