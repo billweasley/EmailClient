@@ -43,7 +43,7 @@ public class SubEmailMessage {
     public SubEmailMessage(String main, String type, String encoding) {
         this.type = type;
         this.encoding = encoding;
-        subEmailMessage += (main + CRLF);
+        subEmailMessage = (main + CRLF);
     }
 
     public String getType() {
