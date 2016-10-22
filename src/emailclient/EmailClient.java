@@ -170,7 +170,7 @@ public class EmailClient extends Frame {
                 }
             }
             /* Create the message */
-            mainText = new SubEmailMessage(messageText.getText(), contentType, null, ContentEncoding);
+            mainText = new SubEmailMessage(messageText.getText(), contentType, ContentEncoding);
             EmailMessage mailMessage;
             try {
                 mailMessage = new EmailMessage(fromField.getText(), toField.getText(), ccField.getText(), subjectField.getText(), mainText, SUBBODIES, serverField.getText());
