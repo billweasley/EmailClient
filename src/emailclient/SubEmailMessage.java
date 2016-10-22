@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package emailclient;
 
 import java.io.File;
@@ -10,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import sun.misc.BASE64Encoder;
+import java.util.Base64;
 
 /**
  *
@@ -23,31 +18,33 @@ public class SubEmailMessage {
     private final String encoding;
 
     private String subEmailMessage = "";
-    public static final String boundary = "#frontier#";
     private static final String CRLF = "\r\n";
 
     public SubEmailMessage(File file) {
-        this(encodeAttach(file), getMessageType(file).toString(), file.getName(), EncodingType.BASE64.toString(), true, "UTF-8");
+        this(encodeAttach(file), getMessageType(file).toString(), file.getName(), EncodingType.BASE64.toString());
     }
 
-    public SubEmailMessage(String partBody, String type, String fileName, String encoding, Boolean isAttachment, String charset) {
+    public SubEmailMessage(String partBody, String type, String fileName, String encoding) {
         this.type = type;
         this.encoding = encoding;
-        subEmailMessage = ("--" + boundary + CRLF);
+        subEmailMessage = ("--" + EmailMessage.BOUNDARY + CRLF);
         if (fileName != null) {
             subEmailMessage += "Content-Type: " + type + "; " + "name=" + fileName + CRLF;
+            subEmailMessage += "Content-Disposition: attachment; " + "filename=" + fileName + CRLF;
         } else {
             subEmailMessage += "Content-Type: " + type + CRLF;
-        }
-        if (isAttachment) {
-            subEmailMessage += "Content-Disposition: attachment; " + "filename=" + fileName + CRLF;
+            subEmailMessage += "Content-Disposition: attachment; " + CRLF;
         }
         subEmailMessage += "Content-Transfer-Encoding: " + encoding + CRLF;
         subEmailMessage += CRLF;
         subEmailMessage += (partBody + CRLF);
     }
 
-
+    public SubEmailMessage(String main, String type, String encoding) {
+        this.type = type;
+        this.encoding = encoding;
+        subEmailMessage += (main + CRLF);
+    }
 
     public String getType() {
         return type;
@@ -58,26 +55,23 @@ public class SubEmailMessage {
     }
 
     public String getSubEmailMessage() {
-        //return subEmailMessage.substring(0, subEmailMessage.length() - 2) + "--" + boundary + "--"+ CRLF;
         return subEmailMessage;
     }
 
     public static String encodeAttach(File file) {
         byte[] data = null;
         try {
-            InputStream isr = new FileInputStream(file);
-            data = new byte[isr.available()];
-            isr.read(data);
-            isr.close();
+            try (InputStream isr = new FileInputStream(file)) {
+                data = new byte[isr.available()];
+                isr.read(data);
+            }
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
             return (file.getName() + "File Not Found");
         } catch (IOException ex) {
-            ex.printStackTrace();
             return ("Failure on encoding: " + file.getName());
         }
-
-        return new BASE64Encoder().encode(data);
+        return Base64.getMimeEncoder().encodeToString(data);
+        // return new BASE64Encoder().encode(data);
     }
 
     public static MessageType getMessageType(File file) {

@@ -43,11 +43,17 @@ public class EmailClient extends Frame {
     private JFileChooser chooser = new JFileChooser();
     private final ArrayList<File> ATTACHES = new ArrayList<>();
     private final ArrayList<SubEmailMessage> SUBBODIES = new ArrayList<>();
-
-    public static String recordedWebpageContentType;
-    public static String recordedWebpageContentEncoding;
-    public static boolean isHTML = false;
     private SubEmailMessage mainText = null;
+    private static String contentType = MessageType.TXT.toString();
+    private static String ContentEncoding = EncodingType.ASCII_7.toString();
+
+    public static void setContentType(String contentType) {
+        EmailClient.contentType = contentType;
+    }
+
+    public static void setContentEncoding(String ContentEncoding) {
+        EmailClient.ContentEncoding = ContentEncoding;
+    }
 
     /**
      * Create a new EmailClient window with fields for entering all the relevant
@@ -126,7 +132,6 @@ public class EmailClient extends Frame {
         try {
             host = System.getProperty("user.name") + "@" + InetAddress.getByName(serverField.getText()).getHostName();
         } catch (UnknownHostException ex) {
-            ex.printStackTrace();
         }
 
         fromField.setText(host);
@@ -165,9 +170,10 @@ public class EmailClient extends Frame {
                 }
             }
             /* Create the message */
+            mainText = new SubEmailMessage(messageText.getText(), contentType, null, ContentEncoding);
             EmailMessage mailMessage;
             try {
-                mailMessage = new EmailMessage(fromField.getText(), toField.getText(), ccField.getText(), subjectField.getText(), messageText.getText(), SUBBODIES, serverField.getText());
+                mailMessage = new EmailMessage(fromField.getText(), toField.getText(), ccField.getText(), subjectField.getText(), mainText, SUBBODIES, serverField.getText());
             } catch (UnknownHostException e) {
                 /* If there is an error, do not go further */
                 return;
@@ -224,7 +230,6 @@ public class EmailClient extends Frame {
                 return;
             } // Change message text
             messageText.setText(receivedText);
-            isHTML = true;
         }
     }
 
@@ -240,9 +245,9 @@ public class EmailClient extends Frame {
             subjectField.setText("");
             messageText.setText("");
             attachmentField.setText("");
-            recordedWebpageContentType = null;
-            recordedWebpageContentEncoding = null;
-            isHTML = false;
+            contentType = MessageType.TXT.toString();
+            ContentEncoding = EncodingType.ASCII_7.toString();
+            mainText = null;
             ATTACHES.clear();
 
         }

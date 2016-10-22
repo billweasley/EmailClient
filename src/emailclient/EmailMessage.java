@@ -18,10 +18,6 @@ public class EmailMessage {
     private String[] Recipients;
 
     private String CcList;
-
-    public String getCcList() {
-        return CcList;
-    }
     private String[] Ccs;
 
     /* Target MX-host */
@@ -34,6 +30,7 @@ public class EmailMessage {
 
     /* To make it look nicer */
     private static final String CRLF = "\r\n";
+    public static final String BOUNDARY = "#frontier#";
 
     public String getSender() {
         return Sender;
@@ -45,6 +42,10 @@ public class EmailMessage {
 
     public String[] getCcs() {
         return Ccs;
+    }
+
+    public String getCcList() {
+        return CcList;
     }
 
     public String getDestHost() {
@@ -67,16 +68,18 @@ public class EmailMessage {
 	 * Create the message object by inserting the required headers from RFC 822
 	 * (From, To, Date).
      */
-    public EmailMessage(String from, String to, String cc, String subject, String mainText, List<SubEmailMessage> attechments,
+    public EmailMessage(String from, String to, String cc, String subject, SubEmailMessage mainText, List<SubEmailMessage> attechments,
             String localServer) throws UnknownHostException {
         /* Remove whitespace */
         Sender = from.trim();
         RecipientList = to.trim();
-        Recipients = RecipientList.split(";");
         CcList = cc.trim();
+
+        Recipients = RecipientList.split(";");
         Ccs = CcList.split(";");
 
         Headers = "From: " + Sender + CRLF;
+
         Headers += "To: ";
         for (String rec : Recipients) {
             Headers += (rec + ",");
@@ -84,53 +87,59 @@ public class EmailMessage {
         Headers = Headers.substring(0, Headers.length() - 1);
         Headers += CRLF;
 
-        Headers += "Cc: ";
-        for (String rec : Ccs) {
-            Headers += (rec + ",");
+        if (Ccs.length != 0) {
+            Headers += "Cc: ";
+            for (String rec : Ccs) {
+                Headers += (rec + ",");
+            }
+            Headers = Headers.substring(0, Headers.length() - 1);
+            Headers += CRLF;
         }
-        Headers = Headers.substring(0, Headers.length() - 1);
-        Headers += CRLF;
 
         Headers += ("Subject: " + subject.trim() + CRLF);
+
         /*
 		 * A close approximation of the required format. Unfortunately only GMT.
          */
-        String boundary = "#frontier#";
-        if (attechments != null) {
-            Headers += ("MIME-Version: 1.0" + CRLF);
-            Headers += ("Content-Type: " + MessageType.MUTI.toString() + "; ");
-            Headers += ("boundary=" + boundary + CRLF);
-        } else {
-            Headers += ("Content-Type: " + MessageType.TXT + CRLF);
-        }
-
         SimpleDateFormat format = new SimpleDateFormat(
                 "EEE, dd MMM yyyy HH:mm:ss 'GMT'");
         String dateString = format.format(new Date());
         Headers += ("Date: " + dateString + CRLF);
 
+        if (attechments != null) {
+            Headers += ("MIME-Version: 1.0" + CRLF);
+            Headers += ("Content-Type: " + MessageType.MUTI.toString() + "; ");
+            Headers += ("boundary=" + BOUNDARY + CRLF);
+        } else {
+            Headers += ("Content-Type: " + mainText.getType() + CRLF);
+        }
 
         /*
-		 * Get message. We must escape the message to make sure that there are
-		 * no single periods on a line. This would mess up sending the mail.
+         * Get message. We must escape the message to make sure that there are
+         * no single periods on a line. This would mess up sending the mail.
          */
         Body = "";
         for (SubEmailMessage sem : attechments) {
             Body += sem.getSubEmailMessage();
         }
-        if (attechments != null) {
-            if ((!(attechments.isEmpty() || mainText.equals(""))) || EmailClient.isHTML) {
-                Body += ("--" + boundary + CRLF);
-                if (EmailClient.isHTML && EmailClient.recordedWebpageContentType != null) {
-                    Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF + CRLF;
-                } else {
-                    Body += "Content-Type: " + MessageType.TXT.toString() + "; " + "charset=UTF-8" + CRLF + CRLF;
-                    Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7.toString() + CRLF + CRLF;
+
+        if (attechments != null && (!(attechments.isEmpty() || mainText.getSubEmailMessage().equals("")))) {
+            Body += ("--" + BOUNDARY + CRLF);
+            if (mainText.getType() != null) {
+                Body += "Content-Type: " + mainText.getType() + ";" + CRLF;
+                if (mainText.getEncoding() != null) {
+                    Body += "Content-Transfer-Encoding: " + mainText.getEncoding() + CRLF;
                 }
+                Body += CRLF;
+            } else {
+                Body += "Content-Type: " + MessageType.TXT.toString() + ";" + CRLF;
+                Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7.toString() + CRLF + CRLF;
             }
+            Body += (escapeMessage(mainText.getSubEmailMessage()) + "--" + BOUNDARY + "--");
+        } else {
+            Body += (escapeMessage(mainText.getSubEmailMessage()));
         }
 
-        Body += (escapeMessage(mainText) + CRLF + "--" + boundary + "--");
         /*
 		 * Take the name of the local mailserver and map it into an InetAddress
          */

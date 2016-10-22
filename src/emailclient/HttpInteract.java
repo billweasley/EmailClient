@@ -135,7 +135,8 @@ public class HttpInteract {
             }
             if (headertemp.contains("Content-Type") || headertemp.contains("Content-type")) {
                 tmp = headertemp.split(":");
-                EmailClient.recordedWebpageContentType = tmp[1].trim();
+                EmailClient.setContentType(tmp[1].trim());
+                EmailClient.setContentEncoding(EncodingType.QP.toString());
             }
         }	// requires about 10 lines of code
         headers = headers.substring(0, (headers.length() - 2));
