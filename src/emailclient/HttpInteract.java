@@ -24,20 +24,15 @@ public class HttpInteract {
     private static final String CRLF = "\r\n";
     private static final int BUF_SIZE = 4096;
     private static final int MAX_OBJECT_SIZE = 102400;
-    private static final int HTTPS_PORT = 443;
-    private boolean isHTTPS;
+
     private TextField tf;
 
     /* Create a HttpInteract object. */
     public HttpInteract(TextField tf, String url) {
         this.tf = tf;
-        isHTTPS = false;
+
         if (url.startsWith("http://")) {
             url = url.substring(7);
-        }
-        if (url.startsWith("https://")) {
-            url = url.substring(8);
-            isHTTPS = true;
         }
         tf.setText(url);
 
@@ -91,11 +86,8 @@ public class HttpInteract {
 
         /* Connect to http server on port 80.
         * Assign input and output streams to connection. */
-        if (isHTTPS) {
-            connection = new Socket(host, HTTPS_PORT);
-        } else {
-            connection = new Socket(host, HTTP_PORT);
-        }
+        connection = new Socket(host, HTTP_PORT);
+
         fromServer = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         toServer = new DataOutputStream(connection.getOutputStream());
 
@@ -130,7 +122,6 @@ public class HttpInteract {
         while (!(headertemp = fromServer.readLine()).equals("")) {
             if (needRedirection) {
                 if (headertemp.contains("Location") || headertemp.contains("location")) {
-                    System.out.println(headertemp);
                     tmp = headertemp.split(":");
                     System.out.println((tmp[1] + ":" + tmp[2]).trim());
                     needRedirection = false;

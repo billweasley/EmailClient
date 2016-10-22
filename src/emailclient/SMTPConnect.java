@@ -68,13 +68,17 @@ public class SMTPConnect {
             cammand = "RCPT TO: <" + recipent + ">" + CRLF;
             sendCommand(cammand, 250);
         }
-        for (String recipent : mailmessage.getCcs()) {
-            cammand = "RCPT TO: <" + recipent + ">" + CRLF;
-            sendCommand(cammand, 250);
+
+        if (mailmessage.getCcs() == null || !mailmessage.getCcList().equals("")) {
+            for (String recipent : mailmessage.getCcs()) {
+                cammand = "RCPT TO: <" + recipent + ">" + CRLF;
+                sendCommand(cammand, 250);
+            }
         }
         cammand = "DATA" + CRLF;
         sendCommand(cammand, 354);
-        cammand = mailmessage.getHeaders() + mailmessage.getBody() + CRLF + "." + CRLF;
+        cammand = mailmessage.getHeaders() + CRLF + mailmessage.getBody() + CRLF + "." + CRLF;
+
         sendCommand(cammand, 250);
 
     }
@@ -95,6 +99,7 @@ public class SMTPConnect {
     /* Send an SMTP command to the server. Check that the reply code is
        what is is supposed to be according to RFC 821. */
     private void sendCommand(String command, int rc) throws IOException {
+
         toServer.writeBytes(command);
         /* Write command to server and read reply from server. */
         String msg = fromServer.readLine();

@@ -2,7 +2,7 @@ package emailclient;
 
 /**
  * ***********************************
- * Filename: EmailMessage.java * ***********************************
+ * Filename: EmailMessage.java ***********************************
  */
 import java.util.*;
 import java.net.InetAddress;
@@ -18,6 +18,10 @@ public class EmailMessage {
     private String[] Recipients;
 
     private String CcList;
+
+    public String getCcList() {
+        return CcList;
+    }
     private String[] Ccs;
 
     /* Target MX-host */
@@ -77,57 +81,56 @@ public class EmailMessage {
         for (String rec : Recipients) {
             Headers += (rec + ",");
         }
+        Headers = Headers.substring(0, Headers.length() - 1);
         Headers += CRLF;
 
         Headers += "Cc: ";
         for (String rec : Ccs) {
             Headers += (rec + ",");
         }
+        Headers = Headers.substring(0, Headers.length() - 1);
         Headers += CRLF;
 
         Headers += ("Subject: " + subject.trim() + CRLF);
         /*
 		 * A close approximation of the required format. Unfortunately only GMT.
          */
+        String boundary = "#frontier#";
+        if (attechments != null) {
+            Headers += ("MIME-Version: 1.0" + CRLF);
+            Headers += ("Content-Type: " + MessageType.MUTI.toString() + "; ");
+            Headers += ("boundary=" + boundary + CRLF);
+        } else {
+            Headers += ("Content-Type: " + MessageType.TXT + CRLF);
+        }
+
         SimpleDateFormat format = new SimpleDateFormat(
                 "EEE, dd MMM yyyy HH:mm:ss 'GMT'");
         String dateString = format.format(new Date());
-        Headers += "Date: " + dateString + CRLF;
+        Headers += ("Date: " + dateString + CRLF);
 
-        String boundary = "----=frontier";
-        String suboundary = "----=subfrontier";
-        if (attechments != null) {
-            Headers += ("MIME-Version: 1.0" + CRLF);
-            Headers += ("Content-Type: " + MessageType.MUTI.toString() + ";" + "\n\t");
-            Headers += "boundary=\"" + boundary + "\"" + CRLF + CRLF;
-        } else {
-            Headers += "Content-Type: " + MessageType.TXT + CRLF + CRLF;
-        }
 
         /*
 		 * Get message. We must escape the message to make sure that there are
 		 * no single periods on a line. This would mess up sending the mail.
          */
-        Body= "";
-        if (!mainText.isEmpty()) {
-            Body += ("--" + boundary + CRLF);
-            Body += "Content-Type: multipart/alternative;" + "\n\t";
-            Body += "boundary=\"" + suboundary + "\"" + CRLF + CRLF;
-        }
-        if (attechments != null || EmailClient.isHTML) {
-            Body += ("--" + suboundary + CRLF);
-        }
-        if (EmailClient.isHTML && EmailClient.recordedWebpageContentType != null) {
-            Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF + CRLF;
-        } else {
-            Body += "Content-Type: " + MessageType.TXT.toString() + ";" + CRLF + "charset=UTF-8" + CRLF;
-            Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7.toString() + CRLF + CRLF;
-        }
-        Body += (escapeMessage(mainText) + CRLF + "--"+ suboundary + "--"+ CRLF+ CRLF);
-
+        Body = "";
         for (SubEmailMessage sem : attechments) {
             Body += sem.getSubEmailMessage();
         }
+        if (attechments != null) {
+            if ((!(attechments.isEmpty() || mainText.equals(""))) || EmailClient.isHTML) {
+                Body += ("--" + boundary + CRLF);
+                if (EmailClient.isHTML && EmailClient.recordedWebpageContentType != null) {
+                    Body += "Content-Type: " + EmailClient.recordedWebpageContentType + ";" + CRLF + CRLF;
+                } else {
+                    Body += "Content-Type: " + MessageType.TXT.toString() + "; " + "charset=UTF-8" + CRLF + CRLF;
+                    Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7.toString() + CRLF + CRLF;
+                }
+            }
+        }
+
+        Body += (escapeMessage(mainText) + CRLF + "--" + boundary + "--");
         /*
 		 * Take the name of the local mailserver and map it into an InetAddress
          */
@@ -148,6 +151,11 @@ public class EmailMessage {
     public boolean isValid() {
         int fromat;
         int toat;
+
+        if (Recipients.equals("")) {
+            return false;
+        }
+
         if (!CcList.equals("")) {
             for (String string : Ccs) {
                 toat = string.indexOf('@');

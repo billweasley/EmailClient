@@ -10,6 +10,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.JFileChooser;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EmailClient extends Frame {
 
@@ -20,11 +22,11 @@ public class EmailClient extends Frame {
     private Label serverLabel = new Label("Local mailserver:");
     private TextField serverField = new TextField("mail.csc.liv.ac.uk", 40);
     private Label fromLabel = new Label("From:");
-    private TextField fromField = new TextField("csstudy@liverpool.ac.uk", 40);
+    private TextField fromField = new TextField("", 40);
     private Label toLabel = new Label("To:");
-    private TextField toField = new TextField("sghwan26@student.liverpool.ac.uk;haoxuan.wang26@student.xjtlu.edu.cn", 40);
+    private TextField toField = new TextField("billweasley20092@gmail.com", 40);
     private Label ccLabel = new Label("Cc:");
-    private TextField ccField = new TextField("billweasley20092@hotmail.com", 40);
+    private TextField ccField = new TextField("", 40);
     private Label subjectLabel = new Label("Subject:");
     private TextField subjectField = new TextField("", 40);
     private Label messageLabel = new Label("Message:");
@@ -45,6 +47,7 @@ public class EmailClient extends Frame {
     public static String recordedWebpageContentType;
     public static String recordedWebpageContentEncoding;
     public static boolean isHTML = false;
+    private SubEmailMessage mainText = null;
 
     /**
      * Create a new EmailClient window with fields for entering all the relevant
@@ -117,6 +120,17 @@ public class EmailClient extends Frame {
         add(buttonPanel, BorderLayout.SOUTH);
         pack();
         setVisible(true);
+
+        /*Verify sender address*/
+        String host = "";
+        try {
+            host = System.getProperty("user.name") + "@" + InetAddress.getByName(serverField.getText()).getHostName();
+        } catch (UnknownHostException ex) {
+            ex.printStackTrace();
+        }
+
+        fromField.setText(host);
+
     }
 
     static public void main(String argv[]) {
@@ -165,7 +179,7 @@ public class EmailClient extends Frame {
                 return;
             }
             try {
-                System.out.println(mailMessage.getBody());
+                System.out.println(mailMessage.getHeaders());
                 SMTPConnect connection = new SMTPConnect(mailMessage);
                 connection.send(mailMessage);
                 connection.close();
@@ -267,5 +281,35 @@ public class EmailClient extends Frame {
             attachmentField.setText("");
         }
 
+    }
+}
+
+enum EncodingType {
+    BASE64("base64"), QP("quoted-printable"), ASCII_8("8BIT"), ASCII_7("7BIT"), BINARY("binary");
+    private final String typeName;
+
+    @Override
+    public String toString() {
+        return typeName;
+    }
+
+    private EncodingType(String typeName) {
+        this.typeName = typeName;
+    }
+}
+
+enum MessageType {
+    TXT("text/plain"), HTML("application/html"), XHTML("application/xhtml+xml"), GIF("image/gif"), JPG("image/jpeg"),
+    PNG("image/png"), MPEG("video/mpeg"), GENER("application/octet-stream"), PDF("application/pdf"), WORD("application/msword"), RFC("message/rfc822"),
+    MUTI("multipart/mixed"), MUTA("multipart/alternative");
+    private final String typeName;
+
+    @Override
+    public String toString() {
+        return typeName;
+    }
+
+    private MessageType(String typeName) {
+        this.typeName = typeName;
     }
 }
