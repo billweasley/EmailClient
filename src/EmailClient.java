@@ -1,17 +1,17 @@
-package emailclient;
-
 /**
  * ***********************************
- * Filename: EmailClient.java Date: ***********************************
- */
+ * Filename: SMTPConnect.java 
+ * Names: Haoxuan WANG,Yuan GAO
+ * Student-IDs: 201219597, 201218960
+ * Date: 21/Oct. 2016
+ * ***********************************
+ **/
 import java.io.*;
 import java.net.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.JFileChooser;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class EmailClient extends Frame {
 
@@ -24,8 +24,8 @@ public class EmailClient extends Frame {
     private Label fromLabel = new Label("From:");
     private TextField fromField = new TextField("", 40);
     private Label toLabel = new Label("To:");
-    private TextField toField = new TextField("billweasley20092@gmail.com", 40);
-    private Label ccLabel = new Label("Cc:");
+    private TextField toField = new TextField("", 40);
+    private Label ccLabel = new Label("Cc:");  /* [Add] CC Fields */
     private TextField ccField = new TextField("", 40);
     private Label subjectLabel = new Label("Subject:");
     private TextField subjectField = new TextField("", 40);
@@ -34,17 +34,21 @@ public class EmailClient extends Frame {
     private Label urlLabel = new Label("HTTP://");
     private TextField urlField = new TextField("cgi.csc.liv.ac.uk/~gairing/test.txt", 40);
     private Button btGet = new Button("Get");
-
+    /* [Add] Attachment buttons */
     private Label attachmentLabel = new Label("Attachment:");
     private TextField attachmentField = new TextField("", 100);
     private Button btAddAttach = new Button("Add an attachment");
     private Button btClearAttach = new Button("Clear all attachments");
-
+    /* [Add] File Chooser to provide access to some files */
     private JFileChooser chooser = new JFileChooser();
+    /* [Add] Temporary File Storage in a List */
     private final ArrayList<File> ATTACHES = new ArrayList<>();
+    /* [Add] After encoding, the File object in ATTACHES list will be in SUBBODIES as SubEmailMessage objects*/
     private final ArrayList<SubEmailMessage> SUBBODIES = new ArrayList<>();
+    /* [Add] SubEmailMessage object variable for user entered characters or fetched characters from HTTP connection*/
     private SubEmailMessage mainText = null;
-    private static String contentType = MessageType.TXT.toString();
+    /* [Add] Fields for mainText*/
+    private static String contentType = MessageType.TXT.toString();  
     private static String ContentEncoding = EncodingType.ASCII_7.toString();
 
     public static void setContentType(String contentType) {
@@ -100,7 +104,8 @@ public class EmailClient extends Frame {
         urlPanel.add(btGet, BorderLayout.EAST);
         fieldPanel.add(urlPanel);
         btGet.addActionListener(new GetListener());
-
+        /* Create a panel for the buttons and add listeners to the attachment
+	   buttons. */
         attachmentField.setEditable(false);
         attechmentPanel.add(attachmentLabel, FlowLayout.LEFT);
         attechmentPanel.add(attachmentField, FlowLayout.CENTER);
@@ -127,7 +132,7 @@ public class EmailClient extends Frame {
         pack();
         setVisible(true);
 
-        /*Verify sender address*/
+        /* [Add]Verify sender address*/
         String host = "";
         try {
             host = System.getProperty("user.name") + "@" + InetAddress.getLocalHost().getCanonicalHostName();
@@ -164,13 +169,17 @@ public class EmailClient extends Frame {
                 System.out.println("Need recipient!");
                 return;
             }
+            /*[Add] Clear SUBBODIES list to avoid duplicated attachment problem when clicking the send button more than once*/
             SUBBODIES.clear();
+            
+            /*[Add] Now transfer file to SubEmailMessage objects (Extract infomation and encoding), then place them into the list*/
             if (!attachmentField.getText().equals("")) {
                 for (File file : ATTACHES) {
                     SUBBODIES.add(new SubEmailMessage(file));
                 }
             }
             /* Create the message */
+            /*[Add] Create the SubEmailMessage object for what user inputted or fetch from the Internet*/
             mainText = new SubEmailMessage(messageText.getText(), contentType, ContentEncoding);
             EmailMessage mailMessage;
             try {
@@ -246,11 +255,11 @@ public class EmailClient extends Frame {
             subjectField.setText("");
             messageText.setText("");
             attachmentField.setText("");
-            contentType = MessageType.TXT.toString();
-            ContentEncoding = EncodingType.ASCII_7.toString();
+            contentType = MessageType.TXT.toString(); //Set to default value
+            ContentEncoding = EncodingType.ASCII_7.toString(); //Set to default value
             mainText = null;
             ATTACHES.clear();
-
+            SUBBODIES.clear();
         }
     }
 
@@ -262,7 +271,7 @@ public class EmailClient extends Frame {
             System.exit(0);
         }
     }
-
+    /* Add an attachment. */
     class AddListener implements ActionListener {
 
         @Override
@@ -278,7 +287,7 @@ public class EmailClient extends Frame {
             attachmentField.setText(temp);
         }
     }
-
+    /* Clear all the attachment. */
     class ClearAttachListener implements ActionListener {
 
         @Override
@@ -290,7 +299,7 @@ public class EmailClient extends Frame {
 
     }
 }
-
+    /* enum for regulate the possible encoding type */
 enum EncodingType {
     BASE64("base64"), QP("quoted-printable"), ASCII_8("8BIT"), ASCII_7("7BIT"), BINARY("binary");
     private final String typeName;
@@ -304,7 +313,7 @@ enum EncodingType {
         this.typeName = typeName;
     }
 }
-
+/* enum for regulate the possible message type */
 enum MessageType {
     TXT("text/plain"), HTML("application/html"), XHTML("application/xhtml+xml"), GIF("image/gif"), JPG("image/jpeg"),
     PNG("image/png"), MPEG("video/mpeg"), GENER("application/octet-stream"), PDF("application/pdf"), WORD("application/msword"), RFC("message/rfc822"),

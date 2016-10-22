@@ -1,10 +1,11 @@
-package emailclient;
-
 /**
  * ***********************************
- * Filename: SMTPConnect.java Names: Student-IDs: Date:
+ * Filename: SMTPConnect.java 
+ * Names: Haoxuan WANG,Yuan GAO
+ * Student-IDs: 201219597, 201218960
+ * Date: 21/Oct/2016 .
  * ***********************************
- */
+ **/
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -21,7 +22,8 @@ public class SMTPConnect {
     /* Streams for reading from and writing to socket */
     private BufferedReader fromServer;
     private DataOutputStream toServer;
-
+    
+    /* Port for SMTP */
     private static final int SMTP_PORT = 25;
     private static final String CRLF = "\r\n";
 
@@ -47,7 +49,6 @@ public class SMTPConnect {
             sendCommand("HELO " + localhost + CRLF, 250);
             isConnected = true;
         } catch (IOException ex) {
-            ex.printStackTrace();
             System.out.println("SMTP Handshaking error.");
         }
 
@@ -56,6 +57,9 @@ public class SMTPConnect {
     /* Send the message. Write the correct SMTP-commands in the
        correct order. No checking for errors, just throw them to the
        caller. */
+    /*
+     * [Alter] our send() method now support mutiple recipients and mutiple Carbon Copy (CC)
+     */
     public void send(EmailMessage mailmessage) throws IOException {
 
         String cammand;
@@ -64,6 +68,7 @@ public class SMTPConnect {
 	   exception thrown from sendCommand(). */
         cammand = "MAIL FROM: <" + mailmessage.getSender() + ">" + CRLF;
         sendCommand(cammand, 250);
+        
         for (String recipent : mailmessage.getRecipients()) {
             cammand = "RCPT TO: <" + recipent + ">" + CRLF;
             sendCommand(cammand, 250);

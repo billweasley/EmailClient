@@ -1,9 +1,11 @@
-package emailclient;
-
 /**
  * ***********************************
- * Filename: EmailMessage.java ***********************************
- */
+ * Filename: SMTPConnect.java 
+ * Names: Haoxuan WANG,Yuan GAO
+ * Student-IDs: 201219597, 201218960
+ * Date: 21/Oct. 2016
+ * ***********************************
+ **/
 import java.util.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -67,6 +69,7 @@ public class EmailMessage {
     /*
 	 * Create the message object by inserting the required headers from RFC 822
 	 * (From, To, Date).
+         * [Alter] it is now support mutiple CC and mutiple recipient as well as MIME (to send attachments)
      */
     public EmailMessage(String from, String to, String cc, String subject, SubEmailMessage mainText, List<SubEmailMessage> attechments,
             String localServer) throws UnknownHostException {
@@ -74,7 +77,7 @@ public class EmailMessage {
         Sender = from.trim();
         RecipientList = to.trim();
         CcList = cc.trim();
-
+        
         Recipients = RecipientList.split(";");
         Ccs = CcList.split(";");
 
@@ -99,13 +102,15 @@ public class EmailMessage {
         Headers += ("Subject: " + subject.trim() + CRLF);
 
         /*
-		 * A close approximation of the required format. Unfortunately only GMT.
+	 * A close approximation of the required format. Unfortunately only GMT.
          */
         SimpleDateFormat format = new SimpleDateFormat(
                 "EEE, dd MMM yyyy HH:mm:ss 'GMT'");
         String dateString = format.format(new Date());
         Headers += ("Date: " + dateString + CRLF);
-
+        /*
+	 * [Add] if there is some attachments, add MIME statements to email header
+         */
         if (!attechments.isEmpty()) {
             Headers += ("MIME-Version: 1.0" + CRLF);
             Headers += ("Content-Type: " + MessageType.MUTI.toString() + "; ");
@@ -119,10 +124,16 @@ public class EmailMessage {
          * no single periods on a line. This would mess up sending the mail.
          */
         Body = "";
+        /*
+	 * [Add] if there is some attachments, add their encoded body to mail body
+         */
         for (SubEmailMessage sem : attechments) {
             Body += sem.getSubEmailMessage();
         }
-
+         /*
+	 * [Add] construct the main mail part (which is the user inputted or getted using the "get" button in UI )
+         * firstly, detect whether there is no attechments or the main mail message
+         */
         if (!(attechments.isEmpty() || mainText.getSubEmailMessage().equals(""))) {
             Body += ("--" + BOUNDARY + CRLF);
             if (mainText.getType() != null) {
@@ -131,12 +142,12 @@ public class EmailMessage {
                     Body += "Content-Transfer-Encoding: " + mainText.getEncoding() + CRLF;
                 }
                 Body += CRLF;
-            } else {
+            } else { //if no type got (i.e. the message partition is not got from the Internet), use text format
                 Body += "Content-Type: " + MessageType.TXT.toString() + ";" + CRLF;
                 Body += "Content-Transfer-Encoding: " + EncodingType.ASCII_7.toString() + CRLF + CRLF;
             }
             Body += (escapeMessage(mainText.getSubEmailMessage()) + "--" + BOUNDARY + "--");
-        } else {
+        } else { //if not (there is no attechments), using a single architecture, send the text directly
             Body += (escapeMessage(mainText.getSubEmailMessage()));
         }
 
@@ -156,6 +167,7 @@ public class EmailMessage {
     /*
 	 * Check whether the message is valid. In other words, check that both
 	 * sender and recipient contain only one @-sign.
+    [Alter] now need to check mutiple recipents as well as CC 
      */
     public boolean isValid() {
         int fromat;

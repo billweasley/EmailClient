@@ -1,8 +1,9 @@
-package emailclient;
-
 /**
  * ***********************************
- * Filename: HttpInteract.java Names: Student-IDs: Date:
+ * Filename: SMTPConnect.java 
+ * Names: Haoxuan WANG,Yuan GAO 
+ * Student-IDs:201219597, 201218960 
+ * Date: 21/Oct/2016 . 
  * ***********************************
  */
 import java.awt.TextField;
@@ -30,7 +31,7 @@ public class HttpInteract {
     /* Create a HttpInteract object. */
     public HttpInteract(TextField tf, String url) {
         this.tf = tf;
-
+        /* [Add] remove the http prefix if a user added by mistake */
         if (url.startsWith("http://")) {
             url = url.substring(7);
         }
@@ -59,6 +60,10 @@ public class HttpInteract {
 	 * as a String (if no errors), 
 	 * otherwise return meaningful error message. 
 	 * Don't catch Exceptions. EmailClient will handle them. */
+ /*
+     * [Alter] Our send() method now support redirection, notice that it do not work if the intended address
+     * want to jump to an address with HTTPS protocol 
+     */
     public String send() throws IOException {
 
         /* buffer to read object in 4kB chunks */
@@ -112,11 +117,11 @@ public class HttpInteract {
         } catch (NullPointerException ne) {
             return ("Error: a failure happend when accessing the address");
         }
-
+        /*[Add] record 301 or 302 code */
         boolean needRedirection = false;
         if ((status = Integer.parseInt(temp[1])) != 200) {
-            if (status == 301 || status == 302) {
-                needRedirection = true;
+            if (status == 301 || status == 302) {  //record two redirection code
+                needRedirection = true; //change flag
             } else {
                 return ("Error: a failure happend when accruing the intended file");
             }
@@ -128,6 +133,7 @@ public class HttpInteract {
 		 * Extract length  from "Content-Length:" (or "Content-length:") 
 		 * header line, if present, and assign to "bodyLength" variable. 
          */
+        /*[Add] record location if there is a 301 or 302 code */
         String headertemp;
         while (!(headertemp = fromServer.readLine()).equals("")) {
             if (needRedirection) {
@@ -145,6 +151,7 @@ public class HttpInteract {
             }
             if (headertemp.contains("Content-Type") || headertemp.contains("Content-type")) {
                 tmp = headertemp.split(":");
+                /*[Add/Alter] record type of information got from this connection, in preparing to the send them in a mail later*/
                 EmailClient.setContentType(tmp[1].trim());
                 EmailClient.setContentEncoding(EncodingType.QP.toString());
             }
