@@ -130,7 +130,7 @@ public class EmailClient extends Frame {
         /*Verify sender address*/
         String host = "";
         try {
-            host = System.getProperty("user.name") + "@" + InetAddress.getByName(serverField.getText()).getHostName();
+            host = System.getProperty("user.name") + "@" + InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException ex) {
         }
 
