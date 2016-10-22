@@ -123,7 +123,7 @@ public class EmailMessage {
             Body += sem.getSubEmailMessage();
         }
 
-        if (attechments != null && (!(attechments.isEmpty() || mainText.getSubEmailMessage().equals("")))) {
+        if (!(attechments.isEmpty() || mainText.getSubEmailMessage().equals(""))) {
             Body += ("--" + BOUNDARY + CRLF);
             if (mainText.getType() != null) {
                 Body += "Content-Type: " + mainText.getType() + ";" + CRLF;
