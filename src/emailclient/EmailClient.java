@@ -130,7 +130,7 @@ public class EmailClient extends Frame {
         /*Verify sender address*/
         String host = "";
         try {
-            host = System.getProperty("user.name") + "@" + InetAddress.getLocalHost().getHostName();
+            host = System.getProperty("user.name") + "@" + InetAddress.getLocalHost().getCanonicalHostName();
         } catch (UnknownHostException ex) {
         }
 
@@ -164,6 +164,7 @@ public class EmailClient extends Frame {
                 System.out.println("Need recipient!");
                 return;
             }
+            SUBBODIES.clear();
             if (!attachmentField.getText().equals("")) {
                 for (File file : ATTACHES) {
                     SUBBODIES.add(new SubEmailMessage(file));
@@ -282,6 +283,7 @@ public class EmailClient extends Frame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            SUBBODIES.clear();
             ATTACHES.clear();
             attachmentField.setText("");
         }
