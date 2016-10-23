@@ -1,6 +1,6 @@
 /**
  * ***********************************
- * Filename: SMTPConnect.java 
+ * Filename: EmailMessage.java 
  * Names: Haoxuan WANG,Yuan GAO
  * Student-IDs: 201219597, 201218960
  * Date: 21/Oct. 2016

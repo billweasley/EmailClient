@@ -1,0 +1,25 @@
+# Extras  
+## Verify sender address  
+The default of sender value now has been setted using the user name from the system and the canonical name of local host.  
+Verify: It can be seen at the "From: " field, it is just a default value and any legal (in format) modifications are allowed. 
+
+
+## Additional headers.  
+Based on MIME, we added appropriate headers, including "Content-Type" "Content-Disposition" and "Content-Transfer-Encoding", to extent the range of the kind of the information that the client can send.  
+ 
++ It now support to send the HTML format email, you can fetch a page and then sent it directly.  
+Verify: using get button to fetch cgi.csc.liv.ac.uk/~gairing/COMP211/Lab1.php, and then sent it.  
+Notice: After getting a webpage, the "Content-Type" will be set to what the webpage provided automatically, if you want to send a pure text, please use the 'clear' button in the bottom to reset the Content-Type parameter at first. There might be some problems in sending some characters in Chinese, but for English, it works.  
+
++ It now support to send attachments, any types and any numbers.  
+Verify: try to send mail with attachments.
+Notice: Sometimes, if you add too much attachments, some name of attachments might be hiden in the field, use mouse click the attachments name field and drag the list to the right (or left if needed) to view all selected attachments.  
+
+## Multiple recipients.
+It supports multiple recipients and CCs and correspondingly the format error check for recipients (and CCs)is updated to fit this requirement.
+Verify: Send it to different email address at one time, use ";"(semicolon) to seperate every address.  
+
+## Follow Redirections.
+When the server return a code "301" or "302", the client will do a redirection according the provided address.  
+Verify: Usually we use "zhihu.com" (a Chinese website similar to Quora) for testing, it will return code "301" and then provide an address starting with "www" (i.e. "www.zhihu.com"), the program will then follow to fetch this page and update the input field.  
+Notice: It does NOT support HTTPS redirection.

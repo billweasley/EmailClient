@@ -1,6 +1,6 @@
 /**
  * ***********************************
- * Filename: SMTPConnect.java 
+ * Filename: SubSMTPConnect.java 
  * Names: Haoxuan WANG,Yuan GAO
  * Student-IDs: 201219597, 201218960
  * Date: 21/Oct/2016 .
@@ -90,7 +90,6 @@ public class SubEmailMessage {
         }
         /* Convert */
         return Base64.getMimeEncoder().encodeToString(data);
-        // return new BASE64Encoder().encode(data);
     }
     /* [Add] Determine the type should be used of a attachment, using extension name of the file */
     public static MessageType getMessageType(File file) {
